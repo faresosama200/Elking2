@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="سجل الدخول إلى حسابك في TalentHub.">
+  <title>مرحباً بعودتك | TalentHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+<div class="ambient-bg" aria-hidden="true">
+  <span class="glow glow-1"></span>
+  <span class="glow glow-2"></span>
+</div>
+
+<nav class="navbar navbar-expand-lg site-nav">
+  <div class="container py-2">
+    <a class="navbar-brand brand" href="../index.html">TalentHub</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+        <li class="nav-item"><a class="nav-link" href="../index.html">الرئيسية</a></li>
+        <li class="nav-item"><a class="nav-link active" href="login.html">تسجيل الدخول</a></li>
+        <li class="nav-item"><a class="btn btn-accent" href="../register/register.html">إنشاء حساب</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="auth-shell container">
+  <section class="auth-grid">
+    <article class="auth-side">
+      <p class="kicker">وصول آمن</p>
+      <h1>أدر منظومة TalentHub من مكان واحد.</h1>
+      <p class="side-copy">سجل الدخول لمراجعة الطلاب ونشر الوظائف وإدارة الجامعات ببيانات مباشرة.</p>
+      <ul class="feature-list">
+        <li>
+          <span class="dot"></span>
+          وصول للوحة التحكم حسب الصلاحيات
+        </li>
+        <li>
+          <span class="dot"></span>
+          موافقات أسرع وتحكم أفضل
+        </li>
+        <li>
+          <span class="dot"></span>
+          إدارة مركزية للوظائف والمهارات
+        </li>
+      </ul>
+    </article>
+
+    <section class="auth-card-wrap">
+      <div class="auth-card">
+        <div class="card-head">
+          <h2>مرحباً بعودتك</h2>
+          <p>سجل الدخول باستخدام بيانات حسابك</p>
+        </div>
+
+        <div id="alertBox" class="alert d-none mb-3" role="alert"></div>
+
+        <form id="loginForm" novalidate>
+          <div class="mb-3">
+            <label for="email" class="form-label">البريد الإلكتروني</label>
+            <input type="email" class="form-control form-control-lg" id="email" autocomplete="email" placeholder="name@company.com" required>
+            <div class="invalid-feedback">يرجى إدخال بريد إلكتروني صحيح.</div>
+          </div>
+
+          <div class="mb-2">
+            <label for="password" class="form-label">كلمة المرور</label>
+            <div class="password-wrap">
+              <input type="password" class="form-control form-control-lg" id="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" required>
+              <button class="password-toggle" type="button" id="togglePassword" aria-label="إظهار كلمة المرور">إظهار</button>
+            </div>
+            <div class="invalid-feedback">كلمة المرور مطلوبة.</div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberMe">
+              <label class="form-check-label" for="rememberMe">تذكرني</label>
+            </div>
+            <a class="forgot-link" href="../register/register.html">لا تملك حساب؟</a>
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" id="submitBtn" class="btn btn-accent btn-lg">
+              <span id="btnText">دخول</span>
+              <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <p class="text-center helper-text mb-0">جديد على TalentHub؟ <a href="../register/register.html">أنشئ حساباً</a></p>
+        </form>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer class="footer">
+  <p class="mb-0">جميع الحقوق محفوظة 2026 TalentHub.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API =
+  window.location.protocol === "file:"
+    ? "http://localhost:8080/php-api/index.php"
+    : new URL("../php-api/index.php", window.location.href).toString();
+(function () {
+  var t = localStorage.getItem("th_token");
+  var u = JSON.parse(localStorage.getItem("th_user") || "null");
+  if (t && u) {
+    var roleRoutes = {
+      ADMIN: "../dashbord/admin/dashbord.html",
+      STUDENT: "../dashbord/student/dashboard.html",
+      COMPANY: "../dashbord/company/dashboard.html",
+      UNIVERSITY: "../dashbord/university/dashboard.html"
+    };
+    window.location.replace(roleRoutes[u.role] || "../index.html");
+  }
+}());
+
+function showAlert(message, type = "danger") {
+  const box = document.getElementById("alertBox");
+  box.textContent = message;
+  box.className = "alert alert-" + type + " mb-3";
+}
+
+function setLoading(on) {
+  document.getElementById("submitBtn").disabled = on;
+  document.getElementById("btnSpinner").classList.toggle("d-none", !on);
+  document.getElementById("btnText").textContent = on ? "جاري تسجيل الدخول..." : "دخول";
+}
+
+document.getElementById("togglePassword").addEventListener("click", function () {
+  const passwordInput = document.getElementById("password");
+  const isHidden = passwordInput.type === "password";
+  passwordInput.type = isHidden ? "text" : "password";
+  this.textContent = isHidden ? "إخفاء" : "إظهار";
+  this.setAttribute("aria-label", isHidden ? "إخفاء كلمة المرور" : "إظهار كلمة المرور");
+});
+
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const form = e.target;
+
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (password.length < 8) {
+    showAlert("كلمة المرور يجب أن تكون 8 أحرف على الأقل.");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const response = await fetch(API + "/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      showAlert(data.message || "فشل تسجيل الدخول.");
+      return;
+    }
+
+    localStorage.setItem("th_token", data.accessToken);
+    localStorage.setItem("th_refresh", data.refreshToken);
+    localStorage.setItem("th_user", JSON.stringify(data.user));
+
+    if (document.getElementById("rememberMe").checked) {
+      localStorage.setItem("th_remember", "1");
+    } else {
+      localStorage.removeItem("th_remember");
+    }
+
+    /* توجيه حسب الدور */
+    const roleRoutes = {
+      ADMIN: "../dashbord/admin/dashbord.html",
+      STUDENT: "../dashbord/student/dashboard.html",
+      COMPANY: "../dashbord/company/dashboard.html",
+      UNIVERSITY: "../dashbord/university/dashboard.html"
+    };
+    
+    const route = roleRoutes[data.user.role] || "../index.html";
+    window.location.href = route;
+  } catch {
+    showAlert("تعذر الاتصال بالخادم. تأكد أن الـ API يعمل.");
+  } finally {
+    setLoading(false);
+  }
+});
+</script>
+<script src="../ui-controls.js"></script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>طلباتي | TalentHub</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<script src="../../dashbord/api.js"></script>
+</head>
+<body class="bg-light">
+<script>
+(function () {
+  var token = localStorage.getItem("th_token");
+  var user = JSON.parse(localStorage.getItem("th_user") || "null");
+  if (!token || !user || user.role !== "STUDENT") {
+    window.location.replace("../../login/login.html");
+  }
+}());
+</script>
+
+<!-- نافبار -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="dashboard.html">TalentHub</a>
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
+        <li class="nav-item"><a class="nav-link" href="jobs.html">الوظائف</a></li>
+        <li class="nav-item"><a class="nav-link active" href="my-applications.html">طلباتي</a></li>
+        <li class="nav-item"><a class="nav-link" href="my-profile.html">ملفي</a></li>
+        <li class="nav-item"><a class="nav-link" onclick="logout()" style="cursor:pointer">تسجيل الخروج</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>طلباتي</h3>
+    <div class="d-flex gap-2 align-items-center">
+      <select id="statusFilter" class="form-select" style="max-width:160px">
+        <option value="">كل الحالات</option>
+        <option value="PENDING">قيد الانتظار</option>
+        <option value="REVIEWED">قيد المراجعة</option>
+        <option value="ACCEPTED">مقبول</option>
+        <option value="REJECTED">مرفوض</option>
+      </select>
+      <select id="pageSize" class="form-select" style="max-width:140px">
+        <option value="10" selected>10 لكل صفحة</option>
+        <option value="20">20 لكل صفحة</option>
+        <option value="50">50 لكل صفحة</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-responsive bg-white shadow-sm rounded p-3">
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>الوظيفة</th>
+          <th>الشركة</th>
+          <th>الحالة</th>
+          <th>تاريخ التقديم</th>
+          <th>رسالة التغطية</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"><tr><td colspan="6" class="text-center text-muted py-4">جاري التحميل...</td></tr></tbody>
+    </table>
+    <div class="d-flex justify-content-between align-items-center mt-3" id="pager"></div>
+  </div>
+</div>
+
+<!-- مودال رسالة التغطية -->
+<div class="modal fade" id="coverLetterModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">رسالة التغطية</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted mb-2">الوظيفة: <strong id="clJobTitle">-</strong></p>
+        <hr>
+        <p id="clText" class="text-body" style="white-space:pre-wrap"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+if (!requireRole("STUDENT")) throw new Error("redirect");
+
+let currentPage = 1;
+let pageLimit = 10;
+let coverLetterModal;
+
+document.addEventListener("DOMContentLoaded", function () {
+  coverLetterModal = new bootstrap.Modal(document.getElementById("coverLetterModal"));
+});
+
+function statusBadgeClass(status) {
+  if (status === "ACCEPTED") return "bg-success";
+  if (status === "REJECTED") return "bg-danger";
+  if (status === "REVIEWED") return "bg-info text-dark";
+  return "bg-warning text-dark";
+}
+
+function viewCoverLetter(jobTitle, text) {
+  document.getElementById("clJobTitle").textContent = jobTitle || "-";
+  document.getElementById("clText").textContent = text || "(لم تكتب رسالة تغطية)";
+  coverLetterModal.show();
+}
+
+async function removeApplication(id) {
+  if (!confirm("هل تريد حذف هذا الطلب؟")) return;
+  try {
+    await apiFetch("/applications/" + id, { method: "DELETE" });
+    showToast("تم حذف الطلب", "success");
+    await loadApplications();
+  } catch (e) {
+    showToast(e.message || "فشل حذف الطلب", "error");
+  }
+}
+
+function renderPager(pagination) {
+  const pager = document.getElementById("pager");
+  if (!pagination || pagination.totalPages <= 1) { pager.innerHTML = ""; return; }
+  pager.innerHTML =
+    "<span class='text-muted small'>صفحة " + pagination.page + " من " + pagination.totalPages + " — إجمالي " + pagination.total + " طلب</span>" +
+    "<div class='d-flex gap-2'>" +
+    "<button class='btn btn-sm btn-outline-secondary' " + (pagination.page <= 1 ? "disabled" : "") + " onclick='goPage(" + (pagination.page - 1) + ")'>السابق</button>" +
+    "<button class='btn btn-sm btn-outline-secondary' " + (pagination.page >= pagination.totalPages ? "disabled" : "") + " onclick='goPage(" + (pagination.page + 1) + ")'>التالي</button>" +
+    "</div>";
+}
+
+function goPage(page) {
+  if (page < 1) return;
+  currentPage = page;
+  loadApplications();
+}
+
+async function loadApplications() {
+  try {
+    const statusVal = document.getElementById("statusFilter").value;
+    let url = "/applications?page=" + currentPage + "&limit=" + pageLimit;
+    if (statusVal) url += "&status=" + statusVal;
+
+    const data = await apiFetch(url);
+    const rows = (data.items || []).map(function (a) {
+      const canDelete = a.status === "PENDING";
+      const deleteBtn = canDelete
+        ? "<button class='btn btn-sm btn-outline-danger' onclick='removeApplication(\"" + a.id + "\")'>حذف</button>"
+        : "<span class='text-muted small badge bg-light text-secondary border'>" + arStatus(a.status) + " - لا يمكن الحذف</span>";
+
+      const hasCover = a.coverLetter && a.coverLetter.trim();
+      const safeTitle = (a.job && a.job.title ? a.job.title : "").replace(/\\/g, "\\\\").replace(/"/g, "&quot;");
+      const safeCover = (a.coverLetter || "").replace(/"/g, "&quot;");
+      const coverBtn = hasCover
+        ? "<button class='btn btn-sm btn-outline-info' onclick='viewCoverLetter(\"" + safeTitle + "\", this.dataset.text)' data-text=\"" + safeCover + "\">عرض</button>"
+        : "<span class='text-muted small'>—</span>";
+
+      return "<tr>" +
+        "<td><strong>" + (a.job && a.job.title ? a.job.title : "-") + "</strong></td>" +
+        "<td>" + (a.job && a.job.companyName ? a.job.companyName : "-") + "</td>" +
+        "<td><span class='badge " + statusBadgeClass(a.status) + "'>" + arStatus(a.status) + "</span></td>" +
+        "<td>" + (a.createdAt || "-") + "</td>" +
+        "<td>" + coverBtn + "</td>" +
+        "<td>" + deleteBtn + "</td>" +
+        "</tr>";
+    });
+
+    document.getElementById("tbody").innerHTML = rows.length
+      ? rows.join("")
+      : "<tr><td colspan='6' class='text-center text-muted py-4'>لا توجد طلبات حالياً</td></tr>";
+    renderPager(data.pagination);
+  } catch (e) {
+    document.getElementById("tbody").innerHTML = "<tr><td colspan='6' class='text-center text-danger py-4'>" + (e.message || "فشل التحميل") + "</td></tr>";
+    renderPager(null);
+  }
+}
+
+loadApplications();
+
+document.getElementById("pageSize").addEventListener("change", function () {
+  pageLimit = Number(this.value) || 10;
+  currentPage = 1;
+  loadApplications();
+});
+
+document.getElementById("statusFilter").addEventListener("change", function () {
+  currentPage = 1;
+  loadApplications();
+});
+</script>
+</body>
+</html>

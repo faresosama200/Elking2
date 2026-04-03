@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-04-03T17:14:00.287Z",
+  "summary": {
+    "passed": 4,
+    "failed": 0
+  },
+  "results": [
+    {
+      "role": "ADMIN",
+      "targetUrl": "http://localhost:8080/dashbord/admin/dashbord.html",
+      "currentUrl": "http://localhost:8080/dashbord/admin/dashbord.html",
+      "screenshot": "C:\\Users\\Alh16\\Downloads\\تبع حامد\\مشروع التخرج\\uat-snapshots\\admin.png",
+      "status": "PASS",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "responseErrors": []
+    },
+    {
+      "role": "STUDENT",
+      "targetUrl": "http://localhost:8080/dashbord/student/dashboard.html",
+      "currentUrl": "http://localhost:8080/dashbord/student/dashboard.html",
+      "screenshot": "C:\\Users\\Alh16\\Downloads\\تبع حامد\\مشروع التخرج\\uat-snapshots\\student.png",
+      "status": "PASS",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "responseErrors": []
+    },
+    {
+      "role": "COMPANY",
+      "targetUrl": "http://localhost:8080/dashbord/company/dashboard.html",
+      "currentUrl": "http://localhost:8080/dashbord/company/dashboard.html",
+      "screenshot": "C:\\Users\\Alh16\\Downloads\\تبع حامد\\مشروع التخرج\\uat-snapshots\\company.png",
+      "status": "PASS",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "responseErrors": []
+    },
+    {
+      "role": "UNIVERSITY",
+      "targetUrl": "http://localhost:8080/dashbord/university/dashboard.html",
+      "currentUrl": "http://localhost:8080/dashbord/university/dashboard.html",
+      "screenshot": "C:\\Users\\Alh16\\Downloads\\تبع حامد\\مشروع التخرج\\uat-snapshots\\university.png",
+      "status": "PASS",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "responseErrors": []
+    }
+  ],
+  "testUsers": {
+    "ADMIN": "admin@talenthub.local",
+    "STUDENT": "uat_student_1775236404503_2319@mail.com",
+    "COMPANY": "uat_company_1775236405293_2829@mail.com",
+    "UNIVERSITY": "uat_university_1775236406000_5418@mail.com"
+  },
+  "cleanup": {
+    "skipped": false,
+    "deletedEmails": 3
+  }
+}

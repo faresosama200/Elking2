@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تقرير باك اند مشروع TalentHub</title>
+  <style>
+    @page { size: A4; margin: 16mm; }
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      line-height: 1.9;
+      font-size: 14px;
+      color: #0f172a;
+      background: #fff;
+    }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h1 { font-size: 28px; }
+    h2 {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #0c4a6e;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+    }
+    h3 { margin-top: 14px; font-size: 17px; color: #1e3a8a; }
+    p { margin: 6px 0; }
+    ul, ol { margin: 6px 0 10px; }
+    li { margin: 3px 0; }
+    .meta {
+      margin-top: 8px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      color: #334155;
+    }
+    .box {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #dbeafe;
+      border-right: 4px solid #2563eb;
+      border-radius: 8px;
+      background: #f8fbff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px;
+      vertical-align: top;
+      text-align: right;
+    }
+    th { background: #f1f5f9; }
+    .footer {
+      margin-top: 18px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <h1>تقرير باك اند مشروع TalentHub</h1>
+  <div class="meta">
+    <strong>نوع المستند:</strong> تقرير تسليم جامعي
+    <br>
+    <strong>المجال:</strong> Backend Architecture and Implementation
+    <br>
+    <strong>المشروع:</strong> TalentHub
+  </div>
+
+  <h2>1) مقدمة</h2>
+  <p>
+    يهدف مشروع TalentHub إلى ربط الطلاب بالشركات والجامعات من خلال منصة إدارة موحدة.
+    يعتمد نجاح المشروع على وجود باك اند قوي يتولى إدارة البيانات والصلاحيات وتنفيذ العمليات الأساسية
+    لجميع الأقسام داخل النظام.
+  </p>
+
+  <h2>2) ما هو الباك اند في هذا المشروع؟</h2>
+  <p>
+    الباك اند هو الجزء المسؤول عن استقبال طلبات الواجهة الأمامية، تنفيذ المنطق البرمجي،
+    التحقق من الصلاحيات، التعامل مع قاعدة البيانات MySQL، ثم إعادة النتائج بصيغة JSON.
+  </p>
+  <div class="box">
+    في TalentHub: الباك اند مبني باستخدام PHP API، وقاعدة البيانات MySQL،
+    مع توكن مصادقة للتحكم في الوصول إلى صفحات الإدارة.
+  </div>
+
+  <h2>3) الأهداف الوظيفية للباك اند</h2>
+  <ul>
+    <li>تفعيل تسجيل الدخول وربطه بقاعدة البيانات.</li>
+    <li>السماح بالدخول للمدير فقط إلى لوحة التحكم.</li>
+    <li>جلب بيانات الجداول من قاعدة البيانات بدل الداتا الثابتة.</li>
+    <li>تنفيذ CRUD كامل لكل قسم: Students, Companies, Universities, Jobs, Skills.</li>
+    <li>توحيد الاستجابات وإدارة الأخطاء لتحسين التكامل مع الفرونت اند.</li>
+  </ul>
+
+  <h2>4) أقسام الباك اند ووظيفة كل قسم</h2>
+
+  <h3>4.1 قسم المصادقة (Auth)</h3>
+  <p>
+    يشمل تسجيل الدخول، إنشاء الحساب، تسجيل الخروج، وإنشاء التوكن.
+    يتم التحقق من البريد وكلمة المرور ومطابقة الدور الوظيفي للمستخدم.
+  </p>
+
+  <h3>4.2 قسم الصلاحيات (Authorization)</h3>
+  <p>
+    يضمن أن العمليات الإدارية لا يمكن تنفيذها إلا بواسطة مستخدم Admin.
+    أي طلب بدون توكن صحيح أو بصلاحيات غير كافية يتم رفضه.
+  </p>
+
+  <h3>4.3 قسم إدارة الطلاب</h3>
+  <p>
+    مسؤول عن إضافة، عرض، تعديل، حذف بيانات الطلاب وربطهم بالجامعة والمهارات.
+  </p>
+
+  <h3>4.4 قسم إدارة الشركات</h3>
+  <p>
+    يتولى حفظ بيانات الشركات وتحديثها وحذفها عند الحاجة، ويستخدمها قسم الوظائف لاحقا.
+  </p>
+
+  <h3>4.5 قسم إدارة الجامعات</h3>
+  <p>
+    يدير بيانات الجامعات المرتبطة بالطلاب، مما يساعد في التصنيف والتقارير.
+  </p>
+
+  <h3>4.6 قسم إدارة الوظائف</h3>
+  <p>
+    يسمح بإضافة الوظائف وتعديلها وربط كل وظيفة بالشركة المناسبة ونوع الوظيفة.
+  </p>
+
+  <h3>4.7 قسم إدارة المهارات</h3>
+  <p>
+    يدير قائمة المهارات الأساسية المستخدمة في تصنيف الطلاب وربطهم بالوظائف.
+  </p>
+
+  <h3>4.8 قسم لوحة التحكم (Dashboard)</h3>
+  <p>
+    يوفر إحصائيات عامة مثل عدد الطلاب والشركات والجامعات والوظائف لمتابعة حالة النظام.
+  </p>
+
+  <h2>5) قاعدة البيانات المستخدمة</h2>
+  <p>
+    تم اعتماد MySQL كقاعدة بيانات رئيسية للنظام، مع تصميم جداول مترابطة لتغطي جميع الوظائف المطلوبة.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>الجدول</th>
+        <th>الغرض منه</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>users</td><td>تخزين المستخدمين والأدوار</td></tr>
+      <tr><td>students</td><td>بيانات الطلاب وربطهم بالجامعات</td></tr>
+      <tr><td>companies</td><td>بيانات الشركات</td></tr>
+      <tr><td>universities</td><td>بيانات الجامعات</td></tr>
+      <tr><td>jobs</td><td>الوظائف المرتبطة بالشركات</td></tr>
+      <tr><td>skills</td><td>قائمة المهارات</td></tr>
+      <tr><td>student_skills</td><td>ربط الطلاب بالمهارات</td></tr>
+      <tr><td>auth_tokens</td><td>إدارة جلسات وتوكنات الدخول</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6) معنى CRUD داخل المشروع</h2>
+  <ol>
+    <li>Create: إضافة سجل جديد إلى قاعدة البيانات.</li>
+    <li>Read: عرض البيانات في الجداول داخل صفحات الإدارة.</li>
+    <li>Update: تعديل البيانات وحفظ التغييرات.</li>
+    <li>Delete: حذف السجل عند الطلب.</li>
+  </ol>
+  <p>
+    كل قسم من الأقسام الخمسة الأساسية تم تزويده بعمليات CRUD كاملة.
+  </p>
+
+  <h2>7) تدفق التنفيذ من Login إلى باقي الأقسام</h2>
+  <ol>
+    <li>المستخدم يدخل البريد وكلمة المرور في صفحة Login.</li>
+    <li>يتم إرسال الطلب إلى API للمصادقة.</li>
+    <li>عند نجاح الدخول يتم حفظ التوكن وبيانات المستخدم.</li>
+    <li>إذا كان الدور Admin يتم التحويل إلى Dashboard.</li>
+    <li>من لوحة التحكم يتم الانتقال إلى صفحات الإدارة المختلفة.</li>
+    <li>كل صفحة تجلب البيانات من MySQL عبر API وتنفذ CRUD عند الضغط على الأزرار.</li>
+  </ol>
+
+  <h2>8) واجهات API المنفذة</h2>
+  <ul>
+    <li>Auth: login, register, logout, health</li>
+    <li>Students: list, get by id, create, update, delete</li>
+    <li>Companies: list, get by id, create, update, delete</li>
+    <li>Universities: list, get by id, create, update, delete</li>
+    <li>Jobs: list, get by id, create, update, delete</li>
+    <li>Skills: list, get by id, create, update, delete</li>
+    <li>Dashboard: stats endpoint</li>
+  </ul>
+
+  <h2>9) معايير الجودة والأمان</h2>
+  <ul>
+    <li>التحقق من المدخلات قبل أي عملية حفظ أو تعديل.</li>
+    <li>حماية المسارات الإدارية بالتوكن والصلاحيات.</li>
+    <li>إرجاع رسائل خطأ واضحة عند الفشل.</li>
+    <li>الاعتماد على قاعدة بيانات فعلية بدل بيانات ثابتة.</li>
+    <li>تنظيم بنية API لتسهيل الصيانة والتطوير لاحقا.</li>
+  </ul>
+
+  <h2>10) الخاتمة</h2>
+  <p>
+    تم تنفيذ باك اند متكامل لمشروع TalentHub يحقق المتطلبات المطلوبة: تسجيل الدخول،
+    تحويل المدير إلى لوحة التحكم، وربط جميع الجداول بقاعدة البيانات مع CRUD كامل لكل قسم.
+    هذا يعكس انتقال المشروع من واجهات عرض ثابتة إلى نظام إداري عملي قابل للتطوير.
+  </p>
+
+  <div class="footer">
+    تقرير مشروع TalentHub - Backend Section (Arabic Version)
+  </div>
+</body>
+</html>

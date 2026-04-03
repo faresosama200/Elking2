@@ -1,0 +1,19 @@
+/* Shared dashboard helpers */
+:root {
+  --th-radius: 12px;
+  --th-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+#toast-container {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 9999;
+}
+
+.card,
+.stat-card,
+.job-card {
+  border-radius: var(--th-radius);
+  box-shadow: var(--th-shadow);
+}

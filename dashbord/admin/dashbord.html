@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>TalentHub Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="../../dashbord/api.js"></script>
+
+<link rel="stylesheet" href="dashbord.css">
+
+</head>
+
+<body>
+
+<script>
+(function () {
+  if (!requireAuth()) return;
+  if (!requireRole('ADMIN')) return;
+}());
+</script>
+
+<nav class="navbar navbar-expand-lg custom-navbar">
+
+<div class="container">
+
+<a class="navbar-brand logo" href="dashbord.html">
+TalentHub
+</a>
+
+<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="navbarMenu">
+
+<ul class="navbar-nav ms-auto align-items-lg-center">
+
+<li class="nav-item">
+<a class="nav-link active" href="dashbord.html">لوحة التحكم</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="admin-students.html">الطلاب</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="admin-companies.html">الشركات</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="admin-universities.html">الجامعات</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="admin-jobs.html">الوظائف</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="admin-skills.html">المهارات</a>
+</li>
+
+<li class="nav-item ms-lg-3">
+<button class="btn btn-danger btn-sm" onclick="logout()">تسجيل الخروج</button>
+</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</nav>
+
+<div class="container mt-5">
+
+<h3 class="mb-4">لوحة تحكم المدير</h3>
+
+<!-- Stats -->
+
+<div class="row g-4">
+
+<div class="col-lg-3 col-md-6">
+
+<div class="card-clean text-center">
+
+<div class="stat-number" id="statStudents">0</div>
+
+<div>الطلاب</div>
+
+</div>
+
+</div>
+
+
+<div class="col-lg-3 col-md-6">
+
+<div class="card-clean text-center">
+
+<div class="stat-number" id="statCompanies">0</div>
+
+<div>الشركات</div>
+
+</div>
+
+</div>
+
+
+<div class="col-lg-3 col-md-6">
+
+<div class="card-clean text-center">
+
+<div class="stat-number" id="statUniversities">0</div>
+
+<div>الجامعات</div>
+
+</div>
+
+</div>
+
+
+<div class="col-lg-3 col-md-6">
+
+<div class="card-clean text-center">
+
+<div class="stat-number" id="statJobs">0</div>
+
+<div>الوظائف</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- Charts -->
+
+<div class="row mt-5 g-4">
+
+<div class="col-lg-6">
+
+<div class="card-clean">
+
+<h5 class="mb-3">الطلاب حسب الجامعة</h5>
+
+<canvas id="studentsChart"></canvas>
+
+</div>
+
+</div>
+
+
+<div class="col-lg-6">
+
+<div class="card-clean">
+
+<h5 class="mb-3">الوظائف المنشورة</h5>
+
+<canvas id="jobsChart"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- Recent Students -->
+
+<div class="card-clean mt-5">
+
+<h5 class="mb-3">أحدث الطلاب</h5>
+
+<table class="table table-hover">
+
+<thead>
+
+<tr>
+
+<th>الاسم</th>
+<th>البريد الإلكتروني</th>
+<th>الجامعة</th>
+<th>الحالة</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recentStudentsRows">
+<tr><td colspan="4" class="text-center text-muted">جاري التحميل...</td></tr>
+</tbody>
+
+</table>
+
+</div>
+
+
+<!-- Recent Jobs -->
+
+<div class="card-clean mt-5">
+
+<h5 class="mb-3">أحدث الوظائف</h5>
+
+<table class="table table-hover">
+
+<thead>
+
+<tr>
+
+<th>المسمى الوظيفي</th>
+<th>الشركة</th>
+<th>النوع</th>
+<th>الحالة</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recentJobsRows">
+<tr><td colspan="4" class="text-center text-muted">جاري التحميل...</td></tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../ui-controls.js"></script>
+<script>
+const studentsChart = new Chart(document.getElementById('studentsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['الجامعة 1', 'الجامعة 2', 'الجامعة 3', 'الجامعة 4'],
+    datasets: [{ label: 'الطلاب', data: [0, 0, 0, 0] }]
+  }
+});
+
+const jobsChart = new Chart(document.getElementById('jobsChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['دوام كامل', 'دوام جزئي', 'تدريب'],
+    datasets: [{ data: [0, 0, 0] }]
+  }
+});
+
+function statusBadge(status) {
+  return status === 'ACTIVE' || status === 'OPEN' ? 'bg-success' : status === 'PENDING' ? 'bg-warning' : 'bg-danger';
+}
+
+function renderRecentStudents(items) {
+  const tbody = document.getElementById('recentStudentsRows');
+  if (!items || items.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">لا توجد بيانات</td></tr>';
+    return;
+  }
+  tbody.innerHTML = items.map((student) => `
+    <tr>
+      <td>${student.user?.fullName || '-'}</td>
+      <td>${student.user?.email || '-'}</td>
+      <td>${student.university?.name || '-'}</td>
+      <td><span class="badge ${statusBadge(student.status)}">${arStatus(student.status)}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderRecentJobs(items) {
+  const tbody = document.getElementById('recentJobsRows');
+  if (!items || items.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">لا توجد بيانات</td></tr>';
+    return;
+  }
+  tbody.innerHTML = items.map((job) => `
+    <tr>
+      <td>${job.title || '-'}</td>
+      <td>${job.company?.name || '-'}</td>
+      <td>${arJobType(job.type)}</td>
+      <td><span class="badge ${statusBadge(job.status)}">${arStatus(job.status)}</span></td>
+    </tr>
+  `).join('');
+}
+
+async function loadDashboard() {
+  try {
+    const [stats, students, jobs, universities] = await Promise.all([
+      apiFetch('/dashboard'),
+      apiFetch('/students?page=1&limit=5'),
+      apiFetch('/jobs?page=1&limit=5'),
+      apiFetch('/universities?page=1&limit=4')
+    ]);
+
+    document.getElementById('statStudents').textContent = stats.stats?.students ?? 0;
+    document.getElementById('statCompanies').textContent = stats.stats?.companies ?? 0;
+    document.getElementById('statUniversities').textContent = stats.stats?.universities ?? 0;
+    document.getElementById('statJobs').textContent = stats.stats?.jobs ?? 0;
+
+    renderRecentStudents(students.items || []);
+    renderRecentJobs(jobs.items || []);
+
+    const uniLabels = (universities.items || []).map((u) => u.name || 'جامعة');
+    const uniData = (universities.items || []).map((u) => u.studentsCount || 0);
+    studentsChart.data.labels = uniLabels.length ? uniLabels : ['الجامعة 1'];
+    studentsChart.data.datasets[0].data = uniData.length ? uniData : [0];
+    studentsChart.update();
+
+    const typeMap = { FULL_TIME: 0, PART_TIME: 0, INTERNSHIP: 0 };
+    (jobs.items || []).forEach((job) => {
+      if (typeMap[job.type] !== undefined) typeMap[job.type] += 1;
+    });
+    jobsChart.data.datasets[0].data = [typeMap.FULL_TIME, typeMap.PART_TIME, typeMap.INTERNSHIP];
+    jobsChart.update();
+  } catch (err) {
+    showToast(err.message || 'تعذر تحميل بيانات الداشبورد', 'error');
+  }
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

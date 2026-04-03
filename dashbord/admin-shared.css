@@ -1,0 +1,150 @@
+/* =================================================
+   TalentHub — Shared Admin Layout & Components
+   ================================================= */
+
+/* ---- Base ---- */
+body {
+  background: #f4f6fb;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ---- Navbar ---- */
+.custom-navbar {
+  background: #111827;
+  padding: 12px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: white !important;
+  text-decoration: none;
+}
+
+.nav-link {
+  color: #d1d5db !important;
+  margin-left: 10px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.nav-link:hover {
+  color: white !important;
+}
+
+.nav-link.active {
+  color: #3b82f6 !important;
+}
+
+.navbar-toggler {
+  background: white;
+}
+
+/* ---- Cards ---- */
+.card-clean {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* ---- Stats ---- */
+.stat-number {
+  font-size: 28px;
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+/* ---- Tables ---- */
+table {
+  background: white;
+}
+
+/* ---- Toast Notification ---- */
+#toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast-msg {
+  min-width: 240px;
+  max-width: 360px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.25s ease;
+}
+
+.toast-msg.success { background: #198754; }
+.toast-msg.error   { background: #dc3545; }
+.toast-msg.info    { background: #0d6efd; }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ---- Search & Pagination toolbar ---- */
+.table-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table-toolbar input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.pagination-bar span {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ---- Loading overlay ---- */
+.table-loading {
+  position: relative;
+}
+
+.table-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 8px;
+  z-index: 10;
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+  text-align: center;
+  padding: 48px 0;
+  color: #9ca3af;
+}
+
+.empty-state svg {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 16px;
+  stroke: currentColor;
+  fill: none;
+}
