@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: talenthub-api
+    env: node
+    rootDir: backend
+    plan: free
+    autoDeploy: true
+    buildCommand: npm install && npm run prisma:generate && npm run prisma:push && npm run seed
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    disk:
+      name: talenthub-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:/var/data/dev.db
+      - key: CORS_ORIGIN
+        value: https://faresosama200.github.io
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRES_IN
+        value: 15m
+      - key: REFRESH_TOKEN_EXPIRES_IN
+        value: 7d
+      - key: LOG_LEVEL
+        value: info
