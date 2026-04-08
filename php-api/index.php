@@ -107,7 +107,6 @@ function route_request(PDO $pdo, array $config, string $method, array $segments,
         case 'dashboard':
             json_response(['user' => $user, 'stats' => dashboard_stats($pdo)]);
             return;
-        default:
         case 'profile':
             handle_profile($pdo, $method, $segments, $input, $user);
             return;
@@ -182,6 +181,9 @@ function handle_auth(PDO $pdo, array $config, string $method, array $segments, a
         $user = query_one($pdo, 'SELECT id, full_name, email, role, status, password_hash FROM users WHERE email = ?', [$email]);
         if (!$user || !password_verify($password, (string)$user['password_hash'])) {
             throw new HttpError('بيانات الدخول غير صحيحة', 401);
+        }
+        if (($user['status'] ?? 'PENDING') !== 'ACTIVE') {
+            throw new HttpError('الحساب قيد المراجعة من المدير', 403);
         }
 
         $tokens = issue_tokens($pdo, $config, (int)$user['id']);
@@ -312,6 +314,11 @@ function handle_students(PDO $pdo, string $method, array $segments, array $input
 
     if ($method === 'PUT' && count($segments) === 2) {
         $id = (int)$segments[1];
+        $student = query_one($pdo, 'SELECT user_id FROM students WHERE id = ?', [$id]);
+        if (!$student) {
+            throw new HttpError('Not found', 404);
+        }
+
         exec_stmt($pdo, 'UPDATE students SET status = COALESCE(?, status), bio = COALESCE(?, bio), university_id = COALESCE(?, university_id) WHERE id = ?', [
             $input['status'] ?? null,
             $input['bio'] ?? null,
@@ -319,22 +326,22 @@ function handle_students(PDO $pdo, string $method, array $segments, array $input
             $id
         ]);
 
-        if (isset($input['fullName']) || isset($input['email'])) {
-            $student = query_one($pdo, 'SELECT user_id FROM students WHERE id = ?', [$id]);
-            if ($student) {
-                exec_stmt($pdo, 'UPDATE users SET full_name = COALESCE(?, full_name), email = COALESCE(?, email) WHERE id = ?', [
-                    $input['fullName'] ?? null,
-                    isset($input['email']) ? strtolower(trim((string)$input['email'])) : null,
-                    (int)$student['user_id']
-                ]);
-            }
-        }
+        exec_stmt($pdo, 'UPDATE users SET full_name = COALESCE(?, full_name), email = COALESCE(?, email), status = COALESCE(?, status) WHERE id = ?', [
+            $input['fullName'] ?? null,
+            isset($input['email']) ? strtolower(trim((string)$input['email'])) : null,
+            $input['status'] ?? null,
+            (int)$student['user_id']
+        ]);
 
         json_response(['message' => 'Updated']);
     }
 
     if ($method === 'DELETE' && count($segments) === 2) {
-        exec_stmt($pdo, 'DELETE FROM students WHERE id = ?', [(int)$segments[1]]);
+        $student = query_one($pdo, 'SELECT user_id FROM students WHERE id = ?', [(int)$segments[1]]);
+        if (!$student) {
+            throw new HttpError('Not found', 404);
+        }
+        exec_stmt($pdo, 'DELETE FROM users WHERE id = ?', [(int)$student['user_id']]);
         json_response(['message' => 'Deleted']);
     }
 
@@ -417,17 +424,31 @@ function handle_companies(PDO $pdo, string $method, array $segments, array $inpu
     }
 
     if ($method === 'PUT' && count($segments) === 2) {
+        $company = query_one($pdo, 'SELECT user_id FROM companies WHERE id = ?', [(int)$segments[1]]);
+        if (!$company) {
+            throw new HttpError('Not found', 404);
+        }
+
         exec_stmt($pdo, 'UPDATE companies SET status = COALESCE(?, status), name = COALESCE(?, name), industry = COALESCE(?, industry) WHERE id = ?', [
             $input['status'] ?? null,
             $input['name'] ?? null,
             $input['industry'] ?? null,
             (int)$segments[1]
         ]);
+        exec_stmt($pdo, 'UPDATE users SET full_name = COALESCE(?, full_name), status = COALESCE(?, status) WHERE id = ?', [
+            $input['name'] ?? null,
+            $input['status'] ?? null,
+            (int)$company['user_id']
+        ]);
         json_response(['message' => 'Updated']);
     }
 
     if ($method === 'DELETE' && count($segments) === 2) {
-        exec_stmt($pdo, 'DELETE FROM companies WHERE id = ?', [(int)$segments[1]]);
+        $company = query_one($pdo, 'SELECT user_id FROM companies WHERE id = ?', [(int)$segments[1]]);
+        if (!$company) {
+            throw new HttpError('Not found', 404);
+        }
+        exec_stmt($pdo, 'DELETE FROM users WHERE id = ?', [(int)$company['user_id']]);
         json_response(['message' => 'Deleted']);
     }
 
@@ -510,17 +531,31 @@ function handle_universities(PDO $pdo, string $method, array $segments, array $i
     }
 
     if ($method === 'PUT' && count($segments) === 2) {
+        $university = query_one($pdo, 'SELECT user_id FROM universities WHERE id = ?', [(int)$segments[1]]);
+        if (!$university) {
+            throw new HttpError('Not found', 404);
+        }
+
         exec_stmt($pdo, 'UPDATE universities SET status = COALESCE(?, status), name = COALESCE(?, name), location = COALESCE(?, location) WHERE id = ?', [
             $input['status'] ?? null,
             $input['name'] ?? null,
             $input['location'] ?? null,
             (int)$segments[1]
         ]);
+        exec_stmt($pdo, 'UPDATE users SET full_name = COALESCE(?, full_name), status = COALESCE(?, status) WHERE id = ?', [
+            $input['name'] ?? null,
+            $input['status'] ?? null,
+            (int)$university['user_id']
+        ]);
         json_response(['message' => 'Updated']);
     }
 
     if ($method === 'DELETE' && count($segments) === 2) {
-        exec_stmt($pdo, 'DELETE FROM universities WHERE id = ?', [(int)$segments[1]]);
+        $university = query_one($pdo, 'SELECT user_id FROM universities WHERE id = ?', [(int)$segments[1]]);
+        if (!$university) {
+            throw new HttpError('Not found', 404);
+        }
+        exec_stmt($pdo, 'DELETE FROM users WHERE id = ?', [(int)$university['user_id']]);
         json_response(['message' => 'Deleted']);
     }
 
@@ -553,7 +588,7 @@ function handle_jobs(PDO $pdo, string $method, array $segments, array $input, ar
             throw new HttpError('بيانات الوظيفة غير مكتملة', 422);
         }
 
-        if (!in_array($type, ['FULL_TIME', 'PART_TIME', 'INTERNSHIP'], true)) {
+        if (!in_array($type, ['FULL_TIME', 'PART_TIME', 'INTERNSHIP', 'REMOTE'], true)) {
             $type = 'FULL_TIME';
         }
 
@@ -953,12 +988,34 @@ function handle_skills(PDO $pdo, string $method, array $segments, array $input):
         if ($name === '' || $category === '') {
             throw new HttpError('يرجى إدخال جميع الحقول', 422);
         }
+
+        $existing = find_skill_by_normalized_name($pdo, $name);
+        if ($existing) {
+            throw new HttpError('المهارة موجودة بالفعل', 409);
+        }
+
         exec_stmt($pdo, 'INSERT INTO skills (name, category, status) VALUES (?, ?, ?)', [$name, $category, 'ACTIVE']);
         json_response(['message' => 'Created'], 201);
     }
 
     if ($method === 'PUT' && count($segments) === 2) {
         $id = (int)$segments[1];
+        $current = query_one($pdo, 'SELECT id, name, category, status FROM skills WHERE id = ?', [$id]);
+        if (!$current) {
+            throw new HttpError('Not found', 404);
+        }
+
+        $nextName = array_key_exists('name', $input) ? trim((string)$input['name']) : (string)$current['name'];
+        $nextCategory = array_key_exists('category', $input) ? trim((string)$input['category']) : (string)$current['category'];
+        if ($nextName === '' || $nextCategory === '') {
+            throw new HttpError('يرجى إدخال جميع الحقول', 422);
+        }
+
+        $existing = find_skill_by_normalized_name($pdo, $nextName, $id);
+        if ($existing) {
+            throw new HttpError('المهارة موجودة بالفعل', 409);
+        }
+
         exec_stmt($pdo, 'UPDATE skills SET name = COALESCE(?, name), category = COALESCE(?, category), status = COALESCE(?, status) WHERE id = ?', [
             $input['name'] ?? null,
             $input['category'] ?? null,
@@ -1011,6 +1068,9 @@ function require_auth_user(PDO $pdo): array
     if (!$row) {
         throw new HttpError('Unauthorized', 401);
     }
+    if (($row['status'] ?? 'PENDING') !== 'ACTIVE') {
+        throw new HttpError('الحساب غير مفعل', 403);
+    }
 
     return map_user($row);
 }
@@ -1028,6 +1088,36 @@ function issue_tokens(PDO $pdo, array $config, int $userId): array
 }
 
 function ensure_runtime_tables(PDO $pdo): void
+{
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS auth_tokens (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            access_token VARCHAR(128) NOT NULL UNIQUE,
+            refresh_token VARCHAR(128) NOT NULL UNIQUE,
+            expires_at DATETIME NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_token_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS application_status_logs (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            application_id INT NOT NULL,
+            from_status ENUM('PENDING','REVIEWED','ACCEPTED','REJECTED') NOT NULL,
+            to_status ENUM('PENDING','REVIEWED','ACCEPTED','REJECTED') NOT NULL,
+            changed_by_user_id INT NOT NULL,
+            changed_by_role ENUM('ADMIN','COMPANY') NOT NULL,
+            changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_audit_application FOREIGN KEY (application_id) REFERENCES job_applications(id) ON DELETE CASCADE,
+            CONSTRAINT fk_audit_changed_by FOREIGN KEY (changed_by_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_audit_application (application_id),
+            INDEX idx_audit_changed_at (changed_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+}
+
 function handle_profile(PDO $pdo, string $method, array $segments, array $input, array $user): void
 {
     $role = $user['role'] ?? '';
@@ -1058,11 +1148,63 @@ function handle_profile(PDO $pdo, string $method, array $segments, array $input,
                 'skills'     => array_map(static fn($s) => ['id' => (string)$s['id'], 'name' => $s['name'], 'category' => $s['category']], $skills)
             ]);
         }
+        if ($role === 'COMPANY') {
+            $company = query_one($pdo,
+                'SELECT id, name, industry, status FROM companies WHERE user_id = ?',
+                [(int)$user['id']]
+            );
+            json_response([
+                'fullName' => $user['fullName'],
+                'email'    => $user['email'],
+                'role'     => $user['role'],
+                'status'   => $user['status'],
+                'company'  => $company ? ['id' => (string)$company['id'], 'name' => $company['name'], 'industry' => $company['industry'], 'status' => $company['status']] : null
+            ]);
+        }
+        if ($role === 'UNIVERSITY') {
+            $university = query_one($pdo,
+                'SELECT id, name, location, status FROM universities WHERE user_id = ?',
+                [(int)$user['id']]
+            );
+            json_response([
+                'fullName'   => $user['fullName'],
+                'email'      => $user['email'],
+                'role'       => $user['role'],
+                'status'     => $user['status'],
+                'university' => $university ? ['id' => (string)$university['id'], 'name' => $university['name'], 'location' => $university['location'], 'status' => $university['status']] : null
+            ]);
+        }
         json_response(['fullName' => $user['fullName'], 'email' => $user['email'], 'role' => $user['role']]);
     }
 
-    // PUT /profile  (update bio / fullName)
+    // PUT /profile  (update bio / fullName / company / university)
     if ($method === 'PUT' && count($segments) === 1) {
+        $fullName = isset($input['fullName']) ? trim((string)$input['fullName']) : null;
+        if ($fullName !== null && $fullName !== '') {
+            exec_stmt($pdo, 'UPDATE users SET full_name = ? WHERE id = ?', [$fullName, (int)$user['id']]);
+        }
+        if ($role === 'COMPANY') {
+            $name     = isset($input['name'])     ? trim((string)$input['name'])     : null;
+            $industry = isset($input['industry']) ? trim((string)$input['industry']) : null;
+            if ($name !== null && $name !== '') {
+                exec_stmt($pdo, 'UPDATE companies SET name = ? WHERE user_id = ?', [$name, (int)$user['id']]);
+            }
+            if ($industry !== null && $industry !== '') {
+                exec_stmt($pdo, 'UPDATE companies SET industry = ? WHERE user_id = ?', [$industry, (int)$user['id']]);
+            }
+            json_response(['message' => 'Updated']);
+        }
+        if ($role === 'UNIVERSITY') {
+            $name     = isset($input['name'])     ? trim((string)$input['name'])     : null;
+            $location = isset($input['location']) ? trim((string)$input['location']) : null;
+            if ($name !== null && $name !== '') {
+                exec_stmt($pdo, 'UPDATE universities SET name = ? WHERE user_id = ?', [$name, (int)$user['id']]);
+            }
+            if ($location !== null && $location !== '') {
+                exec_stmt($pdo, 'UPDATE universities SET location = ? WHERE user_id = ?', [$location, (int)$user['id']]);
+            }
+            json_response(['message' => 'Updated']);
+        }
         if ($role !== 'STUDENT') throw new HttpError('Forbidden', 403);
         $student = query_one($pdo, 'SELECT id FROM students WHERE user_id = ?', [(int)$user['id']]);
         if (!$student) throw new HttpError('Profile not found', 404);
@@ -1083,11 +1225,33 @@ function handle_profile(PDO $pdo, string $method, array $segments, array $input,
         $student = query_one($pdo, 'SELECT id FROM students WHERE user_id = ?', [(int)$user['id']]);
         if (!$student) throw new HttpError('Profile not found', 404);
         $skillId = (int)($input['skillId'] ?? 0);
-        if (!$skillId) throw new HttpError('skillId مطلوب', 422);
-        $skill = query_one($pdo, 'SELECT id FROM skills WHERE id = ?', [$skillId]);
-        if (!$skill) throw new HttpError('المهارة غير موجودة', 404);
+        if ($skillId > 0) {
+            $skill = query_one($pdo, 'SELECT id, name, category FROM skills WHERE id = ?', [$skillId]);
+            if (!$skill) throw new HttpError('المهارة غير موجودة', 404);
+        } else {
+            $name = trim((string)($input['name'] ?? ''));
+            $category = trim((string)($input['category'] ?? ''));
+            if ($name === '') throw new HttpError('اسم المهارة مطلوب', 422);
+
+            $skill = find_skill_by_normalized_name($pdo, $name);
+            if (!$skill) {
+                if ($category === '') throw new HttpError('تصنيف المهارة مطلوب', 422);
+                exec_stmt($pdo, 'INSERT INTO skills (name, category, status) VALUES (?, ?, ?)', [$name, $category, 'ACTIVE']);
+                $skillId = (int)$pdo->lastInsertId();
+                $skill = ['id' => $skillId, 'name' => $name, 'category' => $category];
+            } else {
+                $skillId = (int)$skill['id'];
+            }
+        }
         exec_stmt($pdo, 'INSERT IGNORE INTO student_skills (student_id, skill_id) VALUES (?, ?)', [(int)$student['id'], $skillId]);
-        json_response(['message' => 'تمت إضافة المهارة'], 201);
+        json_response([
+            'message' => 'تمت إضافة المهارة',
+            'skill' => [
+                'id' => (string)$skillId,
+                'name' => (string)($skill['name'] ?? ''),
+                'category' => (string)($skill['category'] ?? '')
+            ]
+        ], 201);
     }
 
     // DELETE /profile/skills/{skillId}  (remove skill)
@@ -1102,23 +1266,6 @@ function handle_profile(PDO $pdo, string $method, array $segments, array $input,
     throw new HttpError('Not found', 404);
 }
 
-function ensure_runtime_tables(PDO $pdo): void
-{
-    exec_stmt($pdo, 'CREATE TABLE IF NOT EXISTS application_status_logs (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        application_id INT NOT NULL,
-        from_status ENUM("PENDING","REVIEWED","ACCEPTED","REJECTED") NOT NULL,
-        to_status ENUM("PENDING","REVIEWED","ACCEPTED","REJECTED") NOT NULL,
-        changed_by_user_id INT NOT NULL,
-        changed_by_role ENUM("ADMIN","COMPANY") NOT NULL,
-        changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        CONSTRAINT fk_audit_application FOREIGN KEY (application_id) REFERENCES job_applications(id) ON DELETE CASCADE,
-        CONSTRAINT fk_audit_changed_by FOREIGN KEY (changed_by_user_id) REFERENCES users(id) ON DELETE CASCADE,
-        INDEX idx_audit_application (application_id),
-        INDEX idx_audit_changed_at (changed_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
-}
-
 function map_user(array $row): array
 {
     return [
@@ -1128,6 +1275,33 @@ function map_user(array $row): array
         'role' => (string)$row['role'],
         'status' => (string)$row['status'],
     ];
+}
+
+function normalize_skill_name(string $value): string
+{
+    $value = trim(mb_strtolower($value, 'UTF-8'));
+    $value = preg_replace('/\s+/u', ' ', $value) ?? $value;
+    $value = preg_replace('/[^\p{L}\p{N}\s\+\#\.\-]/u', '', $value) ?? $value;
+    return trim($value);
+}
+
+function find_skill_by_normalized_name(PDO $pdo, string $name, ?int $excludeId = null): array
+{
+    $sql = 'SELECT id, name, category, status FROM skills';
+    $params = [];
+    if ($excludeId !== null) {
+        $sql .= ' WHERE id <> ?';
+        $params[] = $excludeId;
+    }
+
+    $target = normalize_skill_name($name);
+    foreach (query_all($pdo, $sql, $params) as $row) {
+        if (normalize_skill_name((string)$row['name']) === $target) {
+            return $row;
+        }
+    }
+
+    return [];
 }
 
 function pagination(): array

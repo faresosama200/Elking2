@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>البيانات المسجلة | TalentHub</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link rel="stylesheet" href="admin-shared.css">
+<style>
+.table-wrap { background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08); }
+.kpi-card { background: #fff; border-radius: 14px; border: 1px solid #e5edf5; padding: 16px; }
+.kpi-title { font-size: 13px; color: #5e7287; margin-bottom: 6px; }
+.kpi-value { font-size: 28px; font-weight: 700; color: #102a43; }
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+<nav class="navbar navbar-expand-lg custom-navbar">
+  <div class="container">
+    <a class="navbar-brand logo" href="dashbord.html">TalentHub</a>
+    <button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="dashbord.html">لوحة التحكم</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin-students.html">الطلاب</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin-companies.html">الشركات</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin-universities.html">الجامعات</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin-jobs.html">الوظائف</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin-skills.html">المهارات</a></li>
+        <li class="nav-item"><a class="nav-link active" href="admin-registered-data.html">البيانات المسجلة</a></li>
+        <li class="nav-item ms-3"><button class="btn btn-danger btn-sm" onclick="logout()">تسجيل الخروج</button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5 mb-5">
+  <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+    <div>
+      <h3 class="mb-1">البيانات المسجلة</h3>
+      <p class="text-muted mb-0">عرض موحّد للحسابات المسجلة والوظائف المنشورة داخل المنصة.</p>
+    </div>
+    <button class="btn btn-outline-primary" onclick="loadData()">تحديث البيانات</button>
+  </div>
+
+  <div class="alert alert-warning mb-4" role="alert">
+    ملاحظة: كلمة المرور لا يمكن عرضها كنص صريح لأنها محفوظة بشكل مشفّر (Hash) لأسباب أمنية.
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="kpi-card"><div class="kpi-title">إجمالي الحسابات</div><div id="kpiAccounts" class="kpi-value">0</div></div></div>
+    <div class="col-md-3"><div class="kpi-card"><div class="kpi-title">حسابات نشطة</div><div id="kpiActive" class="kpi-value">0</div></div></div>
+    <div class="col-md-3"><div class="kpi-card"><div class="kpi-title">حسابات معلقة</div><div id="kpiPending" class="kpi-value">0</div></div></div>
+    <div class="col-md-3"><div class="kpi-card"><div class="kpi-title">إجمالي الوظائف</div><div id="kpiJobs" class="kpi-value">0</div></div></div>
+  </div>
+
+  <div class="table-wrap p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">الحسابات المسجلة</h5>
+      <input id="accountSearch" class="form-control" style="max-width:280px" placeholder="ابحث بالاسم أو البريد أو النوع...">
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>النوع</th>
+            <th>الاسم</th>
+            <th>البريد (User)</th>
+            <th>الحالة</th>
+            <th>كلمة المرور</th>
+          </tr>
+        </thead>
+        <tbody id="accountsBody"><tr><td colspan="5" class="text-center text-muted py-4">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-wrap p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">الوظائف المسجلة</h5>
+      <input id="jobSearch" class="form-control" style="max-width:280px" placeholder="ابحث بالمسمى أو الشركة أو الموقع...">
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>المسمى الوظيفي</th>
+            <th>الشركة</th>
+            <th>الموقع</th>
+            <th>النوع</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody id="jobsBody"><tr><td colspan="5" class="text-center text-muted py-4">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="../../dashbord/api.js"></script>
+<script>
+if (!requireRole("ADMIN")) throw new Error("redirect");
+
+let allAccounts = [];
+let allJobs = [];
+
+function statusBadge(status) {
+  if (status === "ACTIVE" || status === "OPEN") return "bg-success";
+  if (status === "PENDING") return "bg-warning text-dark";
+  if (status === "CLOSED") return "bg-secondary";
+  return "bg-secondary";
+}
+
+function roleLabel(role) {
+  if (role === "STUDENT") return "طالب";
+  if (role === "COMPANY") return "شركة";
+  if (role === "UNIVERSITY") return "جامعة";
+  return role || "-";
+}
+
+async function fetchAll(path) {
+  let page = 1;
+  const limit = 50;
+  let totalPages = 1;
+  const items = [];
+
+  while (page <= totalPages) {
+    const data = await apiFetch(path + "?page=" + page + "&limit=" + limit);
+    items.push(...(data.items || []));
+    totalPages = data.pagination?.totalPages || 1;
+    page += 1;
+  }
+
+  return items;
+}
+
+function buildAccounts(students, companies, universities) {
+  const result = [];
+
+  for (const s of students) {
+    result.push({
+      role: "STUDENT",
+      name: s.user?.fullName || "-",
+      email: s.user?.email || "-",
+      status: s.status || "-"
+    });
+  }
+
+  for (const c of companies) {
+    result.push({
+      role: "COMPANY",
+      name: c.name || "-",
+      email: c.user?.email || "-",
+      status: c.status || "-"
+    });
+  }
+
+  for (const u of universities) {
+    result.push({
+      role: "UNIVERSITY",
+      name: u.name || "-",
+      email: u.user?.email || "-",
+      status: u.status || "-"
+    });
+  }
+
+  return result;
+}
+
+function renderAccounts() {
+  const q = (document.getElementById("accountSearch").value || "").trim().toLowerCase();
+  const rows = allAccounts.filter(function (a) {
+    return !q || (a.name + " " + a.email + " " + a.role + " " + a.status).toLowerCase().includes(q);
+  });
+
+  const body = document.getElementById("accountsBody");
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">لا توجد نتائج.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = rows.map(function (a) {
+    return "<tr>"
+      + "<td>" + roleLabel(a.role) + "</td>"
+      + "<td>" + a.name + "</td>"
+      + "<td>" + a.email + "</td>"
+      + "<td><span class='badge " + statusBadge(a.status) + "'>" + arStatus(a.status) + "</span></td>"
+      + "<td><span class='text-muted'>غير متاح</span></td>"
+      + "</tr>";
+  }).join("");
+}
+
+function renderJobs() {
+  const q = (document.getElementById("jobSearch").value || "").trim().toLowerCase();
+  const rows = allJobs.filter(function (j) {
+    return !q || ((j.title || "") + " " + (j.company?.name || "") + " " + (j.location || "")).toLowerCase().includes(q);
+  });
+
+  const body = document.getElementById("jobsBody");
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">لا توجد نتائج.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = rows.map(function (j) {
+    return "<tr>"
+      + "<td>" + (j.title || "-") + "</td>"
+      + "<td>" + (j.company?.name || "-") + "</td>"
+      + "<td>" + (j.location || "-") + "</td>"
+      + "<td>" + arJobType(j.type) + "</td>"
+      + "<td><span class='badge " + statusBadge(j.status) + "'>" + arStatus(j.status) + "</span></td>"
+      + "</tr>";
+  }).join("");
+}
+
+function renderKpis() {
+  const active = allAccounts.filter(function (a) { return a.status === "ACTIVE"; }).length;
+  const pending = allAccounts.filter(function (a) { return a.status === "PENDING"; }).length;
+
+  document.getElementById("kpiAccounts").textContent = allAccounts.length;
+  document.getElementById("kpiActive").textContent = active;
+  document.getElementById("kpiPending").textContent = pending;
+  document.getElementById("kpiJobs").textContent = allJobs.length;
+}
+
+async function loadData() {
+  const accountsBody = document.getElementById("accountsBody");
+  const jobsBody = document.getElementById("jobsBody");
+  accountsBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">جاري التحميل...</td></tr>';
+  jobsBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">جاري التحميل...</td></tr>';
+
+  try {
+    const [students, companies, universities, jobs] = await Promise.all([
+      fetchAll("/students"),
+      fetchAll("/companies"),
+      fetchAll("/universities"),
+      fetchAll("/jobs")
+    ]);
+
+    allAccounts = buildAccounts(students, companies, universities);
+    allJobs = jobs;
+
+    renderKpis();
+    renderAccounts();
+    renderJobs();
+  } catch (err) {
+    showToast(err.message || "فشل تحميل البيانات", "error");
+    accountsBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">فشل تحميل الحسابات</td></tr>';
+    jobsBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">فشل تحميل الوظائف</td></tr>';
+  }
+}
+
+document.getElementById("accountSearch").addEventListener("input", renderAccounts);
+document.getElementById("jobSearch").addEventListener("input", renderJobs);
+
+loadData();
+</script>
+<script src="../../ui-controls.js"></script>
+</body>
+</html>

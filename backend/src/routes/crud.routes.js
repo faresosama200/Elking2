@@ -16,7 +16,9 @@ const {
   jobCreateSchema,
   jobUpdateSchema,
   skillCreateSchema,
-  skillUpdateSchema
+  skillUpdateSchema,
+  applicationCreateSchema,
+  applicationUpdateSchema
 } = require("../validators/resource.schemas");
 
 function buildCrudRouter(config, createSchema, updateSchema, roles = ["ADMIN"]) {
@@ -97,11 +99,23 @@ const skillsRouter = buildCrudRouter(
   ["ADMIN"]
 );
 
+const applicationsRouter = buildCrudRouter(
+  {
+    model: "application",
+    searchFields: [],
+    include: { student: { include: { user: true } }, job: { include: { company: true } } }
+  },
+  applicationCreateSchema,
+  applicationUpdateSchema,
+  ["ADMIN", "STUDENT", "COMPANY"]
+);
+
 module.exports = {
   usersRouter,
   studentsRouter,
   companiesRouter,
   universitiesRouter,
   jobsRouter,
-  skillsRouter
+  skillsRouter,
+  applicationsRouter
 };

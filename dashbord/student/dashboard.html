@@ -98,13 +98,15 @@ async function loadDashboard() {
       apiFetch("/applications?page=1&limit=1")
     ]);
 
-    document.getElementById("availableJobs").textContent = (jobs.pagination?.total ?? 0);
+    const openJobs = (jobs.items || []).filter(job => job.status === "OPEN");
+
+    document.getElementById("availableJobs").textContent = openJobs.length;
     document.getElementById("pendingApps").textContent = (pendingApps.pagination?.total ?? 0);
     document.getElementById("mySkills").textContent = (allApps.pagination?.total ?? 0);
     
     const container = document.getElementById("jobsContainer");
     container.innerHTML = "";
-    (jobs.items || []).slice(0, 6).forEach(job => {
+    openJobs.slice(0, 6).forEach(job => {
       container.innerHTML += `
         <div class="job-card">
           <h5>${job.title}</h5>

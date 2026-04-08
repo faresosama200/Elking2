@@ -250,8 +250,8 @@ const studentsChart = new Chart(document.getElementById('studentsChart'), {
 const jobsChart = new Chart(document.getElementById('jobsChart'), {
   type: 'doughnut',
   data: {
-    labels: ['دوام كامل', 'دوام جزئي', 'تدريب'],
-    datasets: [{ data: [0, 0, 0] }]
+    labels: ['دوام كامل', 'دوام جزئي', 'تدريب', 'عن بعد'],
+    datasets: [{ data: [0, 0, 0, 0] }]
   }
 });
 
@@ -314,17 +314,18 @@ async function loadDashboard() {
     studentsChart.data.datasets[0].data = uniData.length ? uniData : [0];
     studentsChart.update();
 
-    const typeMap = { FULL_TIME: 0, PART_TIME: 0, INTERNSHIP: 0 };
+    const typeMap = { FULL_TIME: 0, PART_TIME: 0, INTERNSHIP: 0, REMOTE: 0 };
     (jobs.items || []).forEach((job) => {
       if (typeMap[job.type] !== undefined) typeMap[job.type] += 1;
     });
-    jobsChart.data.datasets[0].data = [typeMap.FULL_TIME, typeMap.PART_TIME, typeMap.INTERNSHIP];
+    jobsChart.data.datasets[0].data = [typeMap.FULL_TIME, typeMap.PART_TIME, typeMap.INTERNSHIP, typeMap.REMOTE];
     jobsChart.update();
   } catch (err) {
     showToast(err.message || 'تعذر تحميل بيانات الداشبورد', 'error');
   }
 }
 
+if (!requireRole('ADMIN')) throw new Error('redirect');
 loadDashboard();
 </script>
 </body>

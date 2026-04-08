@@ -5,13 +5,16 @@ const pinoHttp = require("pino-http");
 const env = require("./config/env");
 const logger = require("./config/logger");
 const authRoutes = require("./routes/auth.routes");
+const authController = require("./controllers/auth.controller");
+const { requireAuth } = require("./middlewares/auth");
 const {
   usersRouter,
   studentsRouter,
   companiesRouter,
   universitiesRouter,
   jobsRouter,
-  skillsRouter
+  skillsRouter,
+  applicationsRouter
 } = require("./routes/crud.routes");
 const { notFound, errorHandler } = require("./middlewares/error-handler");
 
@@ -75,12 +78,20 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+
+// Profile endpoint (GET + PUT) for all authenticated roles
+const profileRouter = express.Router();
+profileRouter.get("/", requireAuth, authController.getProfile);
+profileRouter.put("/", requireAuth, authController.updateProfile);
+app.use("/api/profile", profileRouter);
+
 app.use("/api/users", usersRouter);
 app.use("/api/students", studentsRouter);
 app.use("/api/companies", companiesRouter);
 app.use("/api/universities", universitiesRouter);
 app.use("/api/jobs", jobsRouter);
 app.use("/api/skills", skillsRouter);
+app.use("/api/applications", applicationsRouter);
 
 app.use(notFound);
 app.use(errorHandler);

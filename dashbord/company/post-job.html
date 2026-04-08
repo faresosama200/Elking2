@@ -1,2 +1,214 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>نشر وظيفة | TalentHub</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet"></head><body class="bg-light"><div class="container py-5"><h3>نشر وظيفة</h3><div class="alert alert-info mt-3">الصفحة جاهزة مبدئياً، ويمكن ربط فورم النشر لاحقاً.</div><a href="dashboard.html" class="btn btn-outline-secondary">العودة</a></div><script src="../../dashbord/api.js"></script><script>requireRole("COMPANY");</script></body></html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نشر وظيفة | TalentHub</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<style>
+body { background: linear-gradient(180deg, #f4f7fb 0%, #eef3f9 100%); min-height: 100vh; }
+.page-shell { max-width: 980px; }
+.hero-card { background: linear-gradient(135deg, #0f4c81 0%, #1b7f8f 100%); color: #fff; border: 0; border-radius: 24px; box-shadow: 0 18px 45px rgba(15, 76, 129, 0.22); }
+.form-card { border: 0; border-radius: 24px; box-shadow: 0 14px 32px rgba(16, 24, 40, 0.08); }
+.section-label { font-size: 13px; font-weight: 700; color: #57738d; text-transform: uppercase; letter-spacing: .03em; }
+.helper-list { margin: 0; padding-right: 18px; }
+.helper-list li + li { margin-top: 8px; }
+.preview-card { background: #f8fbff; border: 1px solid #dbe8f3; border-radius: 18px; }
+.preview-chip { border-radius: 999px; background: #e8f2ff; color: #0c4a6e; padding: 6px 12px; font-size: 12px; font-weight: 700; }
+</style>
+</head>
+<body>
+<script>
+(function () {
+	var token = localStorage.getItem("th_token");
+	var user = JSON.parse(localStorage.getItem("th_user") || "null");
+	if (!token || !user || user.role !== "COMPANY") {
+		window.location.replace("../../login/login.html");
+	}
+}());
+</script>
+
+<nav class="navbar navbar-expand-lg bg-white border-bottom">
+	<div class="container">
+		<a class="navbar-brand fw-bold" href="dashboard.html">TalentHub</a>
+		<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
+		<div class="collapse navbar-collapse" id="menu">
+			<ul class="navbar-nav ms-auto">
+				<li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
+				<li class="nav-item"><a class="nav-link active" href="post-job.html">نشر وظيفة</a></li>
+				<li class="nav-item"><a class="nav-link" href="my-jobs.html">وظائفي</a></li>
+				<li class="nav-item"><a class="nav-link" href="applications.html">الطلبات</a></li>
+				<li class="nav-item"><a class="nav-link" onclick="logout()" style="cursor:pointer">تسجيل الخروج</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<main class="container page-shell py-5">
+	<div id="toast-container"></div>
+
+	<section class="card hero-card mb-4">
+		<div class="card-body p-4 p-lg-5">
+			<div class="row g-4 align-items-center">
+				<div class="col-lg-7">
+					<p class="section-label text-white-50 mb-2">نشر سريع</p>
+					<h1 class="h3 mb-3">أضف وظيفة جديدة لتظهر مباشرة للطلاب على المنصة.</h1>
+					<p class="mb-0 text-white-50">الوظائف الجديدة تُنشأ بحالة مفتوحة ويمكنك لاحقاً إغلاقها أو حذفها من صفحة وظائفي.</p>
+				</div>
+				<div class="col-lg-5">
+					<div class="bg-white bg-opacity-10 rounded-4 p-4">
+						<div class="fw-bold mb-2">قبل النشر</div>
+						<ul class="helper-list text-white-50">
+							<li>اكتب مسمى واضحاً ومباشراً.</li>
+							<li>حدد نوع الوظيفة بدقة.</li>
+							<li>أضف وصفاً مختصراً يشرح المطلوب.</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="row g-4">
+		<div class="col-lg-7">
+			<section class="card form-card">
+				<div class="card-body p-4">
+					<div class="d-flex justify-content-between align-items-center mb-4">
+						<div>
+							<p class="section-label mb-1">بيانات الوظيفة</p>
+							<h2 class="h4 mb-0">نموذج النشر</h2>
+						</div>
+						<a href="my-jobs.html" class="btn btn-outline-secondary">عرض الوظائف المنشورة</a>
+					</div>
+
+					<form id="jobForm" novalidate>
+						<div class="mb-3">
+							<label class="form-label" for="title">المسمى الوظيفي</label>
+							<input class="form-control form-control-lg" id="title" placeholder="مثال: مطور واجهات أمامية" required>
+							<div class="invalid-feedback">يرجى إدخال المسمى الوظيفي.</div>
+						</div>
+
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label class="form-label" for="location">الموقع</label>
+								<input class="form-control" id="location" placeholder="القاهرة أو Remote" value="Remote" required>
+								<div class="invalid-feedback">يرجى إدخال الموقع.</div>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label" for="type">نوع الوظيفة</label>
+								<select class="form-select" id="type" required>
+									<option value="FULL_TIME">دوام كامل</option>
+									<option value="PART_TIME">دوام جزئي</option>
+									<option value="INTERNSHIP">تدريب</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="mt-3 mb-4">
+							<label class="form-label" for="description">الوصف</label>
+							<textarea class="form-control" id="description" rows="7" placeholder="اكتب ملخصاً عن الدور والمسؤوليات والمهارات المطلوبة..."></textarea>
+						</div>
+
+						<div class="d-flex gap-2">
+							<button type="submit" id="submitBtn" class="btn btn-primary px-4">
+								<span id="submitText">نشر الوظيفة</span>
+								<span id="submitSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+							</button>
+							<button type="button" id="resetBtn" class="btn btn-outline-secondary">إعادة تعيين</button>
+						</div>
+					</form>
+				</div>
+			</section>
+		</div>
+
+		<div class="col-lg-5">
+			<section class="card preview-card">
+				<div class="card-body p-4">
+					<p class="section-label mb-2">معاينة</p>
+					<h2 id="previewTitle" class="h4 mb-2">مسمى الوظيفة سيظهر هنا</h2>
+					<div class="d-flex flex-wrap gap-2 mb-3">
+						<span class="preview-chip" id="previewType">دوام كامل</span>
+						<span class="preview-chip" id="previewLocation">Remote</span>
+						<span class="preview-chip">مفتوحة</span>
+					</div>
+					<p id="previewDescription" class="text-muted mb-0">أضف وصف الوظيفة لتظهر معاينته هنا قبل النشر.</p>
+				</div>
+			</section>
+		</div>
+	</div>
+</main>
+
+<script src="../../dashbord/api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+if (!requireRole("COMPANY")) throw new Error("redirect");
+
+const form = document.getElementById("jobForm");
+const titleInput = document.getElementById("title");
+const locationInput = document.getElementById("location");
+const typeInput = document.getElementById("type");
+const descriptionInput = document.getElementById("description");
+
+function setLoading(isLoading) {
+	document.getElementById("submitBtn").disabled = isLoading;
+	document.getElementById("submitSpinner").classList.toggle("d-none", !isLoading);
+	document.getElementById("submitText").textContent = isLoading ? "جارٍ النشر..." : "نشر الوظيفة";
+}
+
+function updatePreview() {
+	document.getElementById("previewTitle").textContent = titleInput.value.trim() || "مسمى الوظيفة سيظهر هنا";
+	document.getElementById("previewLocation").textContent = locationInput.value.trim() || "Remote";
+	document.getElementById("previewType").textContent = arJobType(typeInput.value);
+	document.getElementById("previewDescription").textContent = descriptionInput.value.trim() || "أضف وصف الوظيفة لتظهر معاينته هنا قبل النشر.";
+}
+
+function resetForm() {
+	form.reset();
+	locationInput.value = "Remote";
+	typeInput.value = "FULL_TIME";
+	form.classList.remove("was-validated");
+	updatePreview();
+}
+
+titleInput.addEventListener("input", updatePreview);
+locationInput.addEventListener("input", updatePreview);
+typeInput.addEventListener("change", updatePreview);
+descriptionInput.addEventListener("input", updatePreview);
+document.getElementById("resetBtn").addEventListener("click", resetForm);
+
+form.addEventListener("submit", async function (event) {
+	event.preventDefault();
+	if (!form.checkValidity()) {
+		form.classList.add("was-validated");
+		return;
+	}
+
+	const payload = {
+		title: titleInput.value.trim(),
+		location: locationInput.value.trim(),
+		type: typeInput.value,
+		description: descriptionInput.value.trim()
+	};
+
+	setLoading(true);
+	try {
+		await apiFetch("/jobs", {
+			method: "POST",
+			body: JSON.stringify(payload)
+		});
+		showToast("تم نشر الوظيفة بنجاح", "success");
+		resetForm();
+		setTimeout(function () {
+			window.location.href = "my-jobs.html";
+		}, 700);
+	} catch (error) {
+		showToast(error.message || "فشل نشر الوظيفة", "error");
+	} finally {
+		setLoading(false);
+	}
+});
+
+updatePreview();
+</script>
+</body>
+</html>

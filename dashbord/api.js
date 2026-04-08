@@ -3,14 +3,109 @@
    api.js  (loaded by all dashboard pages)
    ====================================== */
 
-/* Detect dashboard location and set API path accordingly */
+/* Detect dashboard location and resolve the PHP API across common dev setups. */
 const dashboardDepth = window.location.pathname.includes('/dashbord/admin/') ? '../..' :
                       window.location.pathname.includes('/dashbord/') ? '../..' : '.';
+const API_CACHE_KEY = "th_api_base";
+const API_OVERRIDE_KEY = "th_api_override";
+let resolvedApiBasePromise;
 
-const API =
-  window.location.protocol === "file:"
-    ? "http://localhost:8080/php-api/index.php"
-    : new URL(dashboardDepth + "/php-api/index.php", window.location.href).toString();
+function unique(values) {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function normalizeApiBase(value) {
+  return String(value || "").trim().replace(/\/+$/, "");
+}
+
+function getExplicitApiBase() {
+  const byQuery = new URLSearchParams(window.location.search).get("api");
+  const byWindow = window.TALENTHUB_API_BASE;
+  const byStorage = localStorage.getItem(API_OVERRIDE_KEY);
+  const explicit = normalizeApiBase(byQuery || byWindow || byStorage);
+
+  if (byQuery && explicit) {
+    localStorage.setItem(API_OVERRIDE_KEY, explicit);
+  }
+
+  return explicit;
+}
+
+function buildApiCandidates() {
+  const host = window.location.hostname || "localhost";
+  const protocol = host === "127.0.0.1" ? "http:" : (window.location.protocol === "file:" ? "http:" : window.location.protocol);
+  const candidates = [];
+  const explicitApi = getExplicitApiBase();
+
+  if (explicitApi) {
+    candidates.push(explicitApi);
+  }
+
+  if (window.location.protocol !== "file:") {
+    candidates.push(new URL(dashboardDepth + "/php-api/index.php", window.location.href).toString());
+  }
+
+  candidates.push(protocol + "//" + host + "/talenthub/php-api/index.php");
+  candidates.push(protocol + "//" + host + "/php-api/index.php");
+  candidates.push("http://localhost/talenthub/php-api/index.php");
+  candidates.push("http://127.0.0.1/talenthub/php-api/index.php");
+  candidates.push("http://localhost:8080/php-api/index.php");
+  candidates.push("http://127.0.0.1:8080/php-api/index.php");
+  // Node.js backend fallback (port 4000)
+  candidates.push("http://localhost:4000/api");
+  candidates.push("http://127.0.0.1:4000/api");
+
+  return unique(candidates);
+}
+
+async function probeApi(base) {
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller ? window.setTimeout(() => controller.abort(), 1500) : null;
+
+  try {
+    const response = await fetch(base + "/health", {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      signal: controller ? controller.signal : undefined
+    });
+    return response.ok;
+  } catch {
+    return false;
+  } finally {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  }
+}
+
+async function resolveApiBase() {
+  if (resolvedApiBasePromise) {
+    return resolvedApiBasePromise;
+  }
+
+  resolvedApiBasePromise = (async function () {
+    const candidates = buildApiCandidates();
+    const cached = window.sessionStorage.getItem(API_CACHE_KEY);
+
+    if (cached && candidates.includes(cached) && await probeApi(cached)) {
+      return cached;
+    }
+
+    for (const candidate of candidates) {
+      if (await probeApi(candidate)) {
+        window.sessionStorage.setItem(API_CACHE_KEY, candidate);
+        return candidate;
+      }
+    }
+
+    window.sessionStorage.removeItem(API_CACHE_KEY);
+    return candidates[0];
+  }());
+
+  return resolvedApiBasePromise;
+}
+
+const API = buildApiCandidates()[0];
 
 function getToken() {
   return localStorage.getItem("th_token");
@@ -110,15 +205,17 @@ function arJobType(value) {
   const map = {
     FULL_TIME: "دوام كامل",
     PART_TIME: "دوام جزئي",
-    INTERNSHIP: "تدريب"
+    INTERNSHIP: "تدريب",
+    REMOTE: "عن بعد"
   };
   return map[value] || value || "-";
 }
 
 /* ---------- Authenticated fetch ---------- */
 async function apiFetch(path, options = {}) {
+  const apiBase = await resolveApiBase();
   const token = getToken();
-  const response = await fetch(API + path, {
+  const response = await fetch(apiBase + path, {
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: "Bearer " + token } : {})

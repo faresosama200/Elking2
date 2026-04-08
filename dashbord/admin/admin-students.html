@@ -80,6 +80,7 @@ function renderTable(items) {
       <td>${skillsText(student)}</td>
       <td><span class="badge ${statusBadge(student.status)}">${arStatus(student.status)}</span></td>
       <td>
+        <button class="btn btn-sm btn-outline-success me-1" onclick="approveStudent('${student.id}')">اعتماد</button>
         <button class="btn btn-sm btn-outline-danger" onclick="deleteStudent('${student.id}')">حذف</button>
       </td>
     </tr>
@@ -129,6 +130,16 @@ async function deleteStudent(id) {
     loadData();
   } catch (err) {
     showToast(err.message || "فشل الحذف", "error");
+  }
+}
+
+async function approveStudent(id) {
+  try {
+    await apiFetch("/students/" + id, { method: "PUT", body: JSON.stringify({ status: "ACTIVE" }) });
+    showToast("تم اعتماد الطالب", "success");
+    loadData();
+  } catch (err) {
+    showToast(err.message || "فشل التنفيذ", "error");
   }
 }
 

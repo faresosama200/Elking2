@@ -82,12 +82,20 @@
 
 <script src="api.js"></script>
 <script>
-const API_BASE = API; // Use the same API constant from api.js
+if (!requireAuth()) throw new Error('redirect');
+let API_BASE = API;
 let currentToken = null;
 let currentUserId = null;
 let testStudentId = null;
 let testCompanyId = null;
 let testUniversityId = null;
+
+async function getApiBase() {
+    if (typeof resolveApiBase === "function") {
+        API_BASE = await resolveApiBase();
+    }
+    return API_BASE;
+}
 
 function showResult(elementId, message, isError = false) {
     const el = document.getElementById(elementId);
@@ -106,7 +114,8 @@ function showPending(elementId) {
 async function testHealthCheck() {
     showPending("authResult");
     try {
-        const r = await fetch(API_BASE + "/health");
+        const base = await getApiBase();
+        const r = await fetch(base + "/health");
         const data = await r.json();
         showResult("authResult", `✅ Health Check OK\n${JSON.stringify(data, null, 2)}`);
     } catch (e) {
@@ -117,7 +126,8 @@ async function testHealthCheck() {
 async function testLogin() {
     showPending("authResult");
     try {
-        const r = await fetch(API_BASE + "/auth/login", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -142,7 +152,8 @@ async function testLogin() {
 async function testLoginStudent() {
     showPending("authResult");
     try {
-        const r = await fetch(API_BASE + "/auth/login", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -160,7 +171,8 @@ async function testLoginStudent() {
 async function testLogout() {
     showPending("authResult");
     try {
-        const r = await fetch(API_BASE + "/auth/logout", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/auth/logout", {
             method: "POST",
             headers: { "Authorization": `Bearer ${currentToken || ""}` }
         });
@@ -175,7 +187,8 @@ async function testLogout() {
 async function testDashboard() {
     showPending("dashResult");
     try {
-        const r = await fetch(API_BASE + "/dashboard", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/dashboard", {
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
         const data = await r.json();
@@ -188,7 +201,8 @@ async function testDashboard() {
 async function testGetStudents() {
     showPending("studentsResult");
     try {
-        const r = await fetch(API_BASE + "/students?page=1&limit=5", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/students?page=1&limit=5", {
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
         const data = await r.json();
@@ -204,7 +218,8 @@ async function testGetStudents() {
 async function testAddStudent() {
     showPending("studentsResult");
     try {
-        const r = await fetch(API_BASE + "/students", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/students", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -232,7 +247,8 @@ async function testGetOneStudent() {
         return;
     }
     try {
-        const r = await fetch(API_BASE + `/students/${testStudentId}`, {
+        const base = await getApiBase();
+        const r = await fetch(base + `/students/${testStudentId}`, {
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
         const data = await r.json();
@@ -249,7 +265,8 @@ async function testUpdateStudent() {
         return;
     }
     try {
-        const r = await fetch(API_BASE + `/students/${testStudentId}`, {
+        const base = await getApiBase();
+        const r = await fetch(base + `/students/${testStudentId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -274,7 +291,8 @@ async function testDeleteStudent() {
         return;
     }
     try {
-        const r = await fetch(API_BASE + `/students/${testStudentId}`, {
+        const base = await getApiBase();
+        const r = await fetch(base + `/students/${testStudentId}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
@@ -289,7 +307,8 @@ async function testDeleteStudent() {
 async function testGetCompanies() {
     showPending("companiesResult");
     try {
-        const r = await fetch(API_BASE + "/companies?page=1&limit=5", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/companies?page=1&limit=5", {
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
         const data = await r.json();
@@ -305,7 +324,8 @@ async function testGetCompanies() {
 async function testAddCompany() {
     showPending("companiesResult");
     try {
-        const r = await fetch(API_BASE + "/companies", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/companies", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -329,7 +349,8 @@ async function testAddCompany() {
 async function testGetUniversities() {
     showPending("universitiesResult");
     try {
-        const r = await fetch(API_BASE + "/universities?page=1&limit=5", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/universities?page=1&limit=5", {
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
         const data = await r.json();
@@ -345,7 +366,8 @@ async function testGetUniversities() {
 async function testAddUniversity() {
     showPending("universitiesResult");
     try {
-        const r = await fetch(API_BASE + "/universities", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/universities", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -368,7 +390,8 @@ async function testAddUniversity() {
 async function testGetJobs() {
     showPending("jobsResult");
     try {
-        const r = await fetch(API_BASE + "/jobs?page=1&limit=5", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/jobs?page=1&limit=5", {
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
         const data = await r.json();
@@ -381,7 +404,8 @@ async function testGetJobs() {
 async function testAddJob() {
     showPending("jobsResult");
     try {
-        const r = await fetch(API_BASE + "/jobs", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/jobs", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -404,7 +428,8 @@ async function testAddJob() {
 async function testGetSkills() {
     showPending("skillsResult");
     try {
-        const r = await fetch(API_BASE + "/skills?page=1&limit=10", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/skills?page=1&limit=10", {
             headers: { "Authorization": `Bearer ${currentToken || localStorage.getItem("th_token")}` }
         });
         const data = await r.json();
@@ -417,7 +442,8 @@ async function testGetSkills() {
 async function testAddSkill() {
     showPending("skillsResult");
     try {
-        const r = await fetch(API_BASE + "/skills", {
+        const base = await getApiBase();
+        const r = await fetch(base + "/skills", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -440,15 +466,16 @@ async function runE2ETest() {
     const steps = [];
     
     try {
+        const base = await getApiBase();
         // Step 1: Health check
         steps.push("1️⃣ Health Check...");
-        let r = await fetch(API_BASE + "/health");
+        let r = await fetch(base + "/health");
         if (!r.ok) throw new Error("Health check failed");
         steps.push("   ✅ Health OK");
         
         // Step 2: Login
         steps.push("2️⃣ Admin Login...");
-        r = await fetch(API_BASE + "/auth/login", {
+        r = await fetch(base + "/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: "admin@talenthub.local", password: "Admin1234" })
@@ -460,7 +487,7 @@ async function runE2ETest() {
         
         // Step 3: Get Dashboard
         steps.push("3️⃣ Get Dashboard...");
-        r = await fetch(API_BASE + "/dashboard", { headers: { "Authorization": `Bearer ${currentToken}` } });
+        r = await fetch(base + "/dashboard", { headers: { "Authorization": `Bearer ${currentToken}` } });
         const dashboard = await r.json();
         if (!r.ok) throw new Error("Dashboard failed");
         steps.push("   ✅ Dashboard loaded");
@@ -468,7 +495,7 @@ async function runE2ETest() {
         
         // Step 4: Get Students
         steps.push("4️⃣ Get Students...");
-        r = await fetch(API_BASE + "/students?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
+        r = await fetch(base + "/students?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
         const students = await r.json();
         if (!r.ok) throw new Error("Students failed");
         steps.push(`   ✅ Got ${students.items?.length || 0} students`);
@@ -479,35 +506,35 @@ async function runE2ETest() {
         
         // Step 5: Get Companies
         steps.push("5️⃣ Get Companies...");
-        r = await fetch(API_BASE + "/companies?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
+        r = await fetch(base + "/companies?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
         const companies = await r.json();
         if (!r.ok) throw new Error("Companies failed");
         steps.push(`   ✅ Got ${companies.items?.length || 0} companies`);
         
         // Step 6: Get Universities
         steps.push("6️⃣ Get Universities...");
-        r = await fetch(API_BASE + "/universities?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
+        r = await fetch(base + "/universities?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
         const universities = await r.json();
         if (!r.ok) throw new Error("Universities failed");
         steps.push(`   ✅ Got ${universities.items?.length || 0} universities`);
         
         // Step 7: Get Jobs
         steps.push("7️⃣ Get Jobs...");
-        r = await fetch(API_BASE + "/jobs?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
+        r = await fetch(base + "/jobs?page=1&limit=3", { headers: { "Authorization": `Bearer ${currentToken}` } });
         const jobs = await r.json();
         if (!r.ok) throw new Error("Jobs failed");
         steps.push(`   ✅ Got ${jobs.items?.length || 0} jobs`);
         
         // Step 8: Get Skills
         steps.push("8️⃣ Get Skills...");
-        r = await fetch(API_BASE + "/skills?page=1&limit=5", { headers: { "Authorization": `Bearer ${currentToken}` } });
+        r = await fetch(base + "/skills?page=1&limit=5", { headers: { "Authorization": `Bearer ${currentToken}` } });
         const skills = await r.json();
         if (!r.ok) throw new Error("Skills failed");
         steps.push(`   ✅ Got ${skills.items?.length || 0} skills`);
         
         // Step 9: Logout
         steps.push("9️⃣ Logout...");
-        r = await fetch(API_BASE + "/auth/logout", { method: "POST", headers: { "Authorization": `Bearer ${currentToken}` } });
+        r = await fetch(base + "/auth/logout", { method: "POST", headers: { "Authorization": `Bearer ${currentToken}` } });
         currentToken = null;
         steps.push("   ✅ Logout OK");
         

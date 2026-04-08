@@ -66,6 +66,14 @@ const skillCreateSchema = z.object({
 
 const skillUpdateSchema = skillCreateSchema.partial();
 
+const applicationCreateSchema = z.object({
+  studentId: z.string().min(2),
+  jobId: z.string().min(2),
+  status: z.enum(["PENDING", "REVIEWED", "ACCEPTED", "REJECTED"]).optional()
+});
+
+const applicationUpdateSchema = applicationCreateSchema.partial();
+
 module.exports = {
   querySchema,
   idParamSchema,
@@ -80,5 +88,7 @@ module.exports = {
   jobCreateSchema,
   jobUpdateSchema,
   skillCreateSchema,
-  skillUpdateSchema
+  skillUpdateSchema,
+  applicationCreateSchema,
+  applicationUpdateSchema
 };

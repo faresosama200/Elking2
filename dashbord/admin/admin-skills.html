@@ -65,8 +65,9 @@
         </div>
         <div class="mb-3">
           <label class="form-label">التصنيف</label>
-          <input type="text" class="form-control" id="skillCategory">
+          <input type="text" class="form-control" id="skillCategory" list="skillCategoryOptions">
         </div>
+        <datalist id="skillCategoryOptions"></datalist>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
@@ -86,6 +87,30 @@ const limit = 10;
 let searchQuery = "";
 let searchTimer;
 let editingId = null;
+const SKILL_CATEGORIES = [
+  "Frontend",
+  "Backend",
+  "Full Stack",
+  "Mobile",
+  "Data Analysis",
+  "Data Science",
+  "Machine Learning",
+  "AI",
+  "UI/UX",
+  "DevOps",
+  "Cloud",
+  "Cybersecurity",
+  "Database",
+  "Testing",
+  "Business",
+  "Soft Skills"
+];
+
+function initCategoryOptions() {
+  document.getElementById("skillCategoryOptions").innerHTML = SKILL_CATEGORIES.map(function (category) {
+    return `<option value="${category}"></option>`;
+  }).join("");
+}
 
 function statusBadge(status) {
   return status === "ACTIVE" ? "bg-success" : "bg-secondary";
@@ -219,6 +244,7 @@ document.getElementById("searchInput").addEventListener("input", function () {
 });
 
 loadData();
+initCategoryOptions();
 </script>
 <script src="../../ui-controls.js"></script>
 </body>

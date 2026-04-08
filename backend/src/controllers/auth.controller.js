@@ -143,6 +143,63 @@ async function me(req, res) {
   return res.json({ user: req.user });
 }
 
+async function getProfile(req, res, next) {
+  try {
+    const user = req.user;
+    const data = {
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      status: user.status
+    };
+    if (user.role === "COMPANY") {
+      data.company = await prisma.company.findUnique({ where: { userId: user.id } });
+    } else if (user.role === "UNIVERSITY") {
+      data.university = await prisma.university.findUnique({ where: { userId: user.id } });
+    } else if (user.role === "STUDENT") {
+      data.student = await prisma.student.findUnique({
+        where: { userId: user.id },
+        include: { university: true, skills: { include: { skill: true } } }
+      });
+    }
+    return res.json(data);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function updateProfile(req, res, next) {
+  try {
+    const user = req.user;
+    const { fullName, name, industry, location, bio } = req.body;
+    if (fullName) {
+      await prisma.user.update({ where: { id: user.id }, data: { fullName } });
+    }
+    if (user.role === "COMPANY") {
+      const patch = {};
+      if (name) patch.name = name;
+      if (industry) patch.industry = industry;
+      if (Object.keys(patch).length) {
+        await prisma.company.update({ where: { userId: user.id }, data: patch });
+      }
+    } else if (user.role === "UNIVERSITY") {
+      const patch = {};
+      if (name) patch.name = name;
+      if (location) patch.location = location;
+      if (Object.keys(patch).length) {
+        await prisma.university.update({ where: { userId: user.id }, data: patch });
+      }
+    } else if (user.role === "STUDENT") {
+      if (bio !== undefined) {
+        await prisma.student.update({ where: { userId: user.id }, data: { bio } });
+      }
+    }
+    return res.json({ message: "Profile updated" });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function logout(req, res, next) {
   try {
     await prisma.user.update({
@@ -160,5 +217,7 @@ module.exports = {
   login,
   refresh,
   me,
+  getProfile,
+  updateProfile,
   logout
 };

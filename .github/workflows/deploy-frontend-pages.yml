@@ -1,0 +1,71 @@
+name: Deploy Frontend To GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static site bundle
+        shell: bash
+        run: |
+          set -e
+          rm -rf public
+          mkdir -p public
+
+          cp -r dashbord public/
+          cp -r login public/
+          cp -r register public/
+          cp -r dashboard public/ || true
+          cp -r styles.css public/ 2>/dev/null || true
+          cp -r style.css public/ 2>/dev/null || true
+          cp -r ui-styles.css public/ 2>/dev/null || true
+          cp -r ui-controls.js public/ 2>/dev/null || true
+
+          cat > public/index.html << 'HTML'
+          <!doctype html>
+          <html lang="ar" dir="rtl">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta http-equiv="refresh" content="0; url=./login/login.html" />
+            <title>TalentHub</title>
+          </head>
+          <body>
+            <p>Redirecting to login page...</p>
+            <script>location.replace('./login/login.html');</script>
+          </body>
+          </html>
+          HTML
+
+          touch public/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

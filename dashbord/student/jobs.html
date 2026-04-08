@@ -187,7 +187,7 @@ async function loadJobs() {
     if (q) query += "&q=" + encodeURIComponent(q);
 
     const data = await apiFetch(query);
-    let items = data.items || [];
+    let items = (data.items || []).filter(function (j) { return j.status === "OPEN"; });
     if (type) items = items.filter(function (j) { return j.type === type; });
     if (!items.length) {
       document.getElementById("tbody").innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">لا توجد وظائف حالياً.</td></tr>';

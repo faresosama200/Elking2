@@ -90,6 +90,25 @@
           <div id="availableSkillsList" class="d-flex flex-wrap gap-2">
             <span class="text-muted small">اكتب للبحث...</span>
           </div>
+
+          <hr>
+          <h6 class="text-secondary mb-2">إضافة مهارة جديدة:</h6>
+          <p class="text-muted small mb-3">إذا لم تجد المهارة في القائمة، يمكنك إضافتها بنفسك ثم ستظهر مباشرة في مهاراتك.</p>
+          <div class="row g-2 align-items-end mb-2">
+            <div class="col-md-5">
+              <label class="form-label small fw-semibold" for="newSkillName">اسم المهارة</label>
+              <input id="newSkillName" type="text" class="form-control" placeholder="مثال: React">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold" for="newSkillCategory">التصنيف</label>
+              <input id="newSkillCategory" type="text" class="form-control" list="skillCategoryOptions" placeholder="مثال: Frontend">
+            </div>
+            <div class="col-md-3 d-grid">
+              <button id="createSkillBtn" class="btn btn-outline-primary" type="button" onclick="createSkill()">إضافة المهارة</button>
+            </div>
+          </div>
+          <datalist id="skillCategoryOptions"></datalist>
+          <div id="newSkillHint" class="text-muted small"></div>
         </div>
       </div>
 
@@ -119,6 +138,38 @@ if (!requireRole("STUDENT")) throw new Error("redirect");
 let mySkillIds = new Set();
 let allSkills = [];
 let debTimer;
+const SKILL_CATEGORIES = [
+  "Frontend",
+  "Backend",
+  "Full Stack",
+  "Mobile",
+  "Data Analysis",
+  "Data Science",
+  "Machine Learning",
+  "AI",
+  "UI/UX",
+  "DevOps",
+  "Cloud",
+  "Cybersecurity",
+  "Database",
+  "Testing",
+  "Business",
+  "Soft Skills"
+];
+
+function normalizeText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[^\p{L}\p{N}\s+#.-]/gu, "");
+}
+
+function initCategoryOptions() {
+  document.getElementById("skillCategoryOptions").innerHTML = SKILL_CATEGORIES.map(function (category) {
+    return "<option value=\"" + category + "\"></option>";
+  }).join("");
+}
 
 // ---- load profile ----
 async function loadProfile() {
@@ -194,6 +245,55 @@ async function addSkill(skillId, skillName) {
   }
 }
 
+async function createSkill() {
+  const nameInput = document.getElementById("newSkillName");
+  const categoryInput = document.getElementById("newSkillCategory");
+  const button = document.getElementById("createSkillBtn");
+  const hint = document.getElementById("newSkillHint");
+
+  const name = nameInput.value.trim();
+  const category = categoryInput.value.trim();
+
+  if (!name || !category) {
+    hint.textContent = "اكتب اسم المهارة والتصنيف أولاً.";
+    hint.className = "text-danger small";
+    return;
+  }
+
+  const existing = allSkills.find(function (skill) {
+    return normalizeText(skill.name) === normalizeText(name);
+  });
+  if (existing) {
+    hint.textContent = "هذه المهارة موجودة بالفعل في النظام. سيتم إضافتها إلى ملفك مباشرة.";
+    hint.className = "text-warning small";
+    await addSkill(existing.id, existing.name);
+    nameInput.value = "";
+    categoryInput.value = "";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "جارٍ الإضافة...";
+  try {
+    const response = await apiFetch("/profile/skills", {
+      method: "POST",
+      body: JSON.stringify({ name, category })
+    });
+    hint.textContent = "تم إنشاء المهارة وإضافتها إلى ملفك.";
+    hint.className = "text-success small";
+    nameInput.value = "";
+    categoryInput.value = "";
+    showToast("تمت إضافة «" + (response.skill?.name || name) + "»", "success");
+    await Promise.all([loadProfile(), loadAllSkills()]);
+  } catch (e) {
+    hint.textContent = e.message || "فشل إنشاء المهارة.";
+    hint.className = "text-danger small";
+  } finally {
+    button.disabled = false;
+    button.textContent = "إضافة المهارة";
+  }
+}
+
 // ---- remove skill ----
 async function removeSkill(skillId, skillName) {
   if (!confirm("هل تريد إزالة مهارة «" + skillName + "»؟")) return;
@@ -219,6 +319,11 @@ function renderAvailableSkills(skills) {
   const notOwned = filtered.filter(function(s) { return !mySkillIds.has(String(s.id)); });
   if (!notOwned.length) {
     container.innerHTML = "<span class='text-muted small'>" + (q ? "لا نتائج." : "جميع المهارات مضافة.") + "</span>";
+    const hint = document.getElementById("newSkillHint");
+    if (q) {
+      hint.textContent = "إذا لم تجد المهارة المطلوبة، أضفها من النموذج أدناه.";
+      hint.className = "text-muted small";
+    }
     return;
   }
   container.innerHTML = notOwned.slice(0, 30).map(function(s) {
@@ -242,9 +347,18 @@ document.getElementById("skillSearch").addEventListener("input", function() {
   debTimer = setTimeout(function() { renderAvailableSkills(allSkills); }, 300);
 });
 
+document.getElementById("newSkillName").addEventListener("input", function () {
+  document.getElementById("newSkillHint").textContent = "";
+});
+
+document.getElementById("newSkillCategory").addEventListener("input", function () {
+  document.getElementById("newSkillHint").textContent = "";
+});
+
 // ---- init ----
 loadProfile();
 loadAllSkills();
+initCategoryOptions();
 </script>
 </body>
 </html>
