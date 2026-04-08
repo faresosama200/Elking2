@@ -8,15 +8,11 @@ services:
     buildCommand: npm install && npm run prisma:generate && npm run prisma:push && npm run seed
     startCommand: npm run start
     healthCheckPath: /api/health
-    disk:
-      name: talenthub-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: file:/var/data/dev.db
+        value: file:/tmp/dev.db
       - key: CORS_ORIGIN
         value: https://faresosama200.github.io
       - key: JWT_ACCESS_SECRET
