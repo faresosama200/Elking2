@@ -6,6 +6,8 @@
     "setup:api": "npm --prefix backend install && npm --prefix backend run prisma:generate && npm --prefix backend run prisma:push",
     "dev:api": "npm --prefix backend run dev",
     "start:api": "npm --prefix backend run start",
+    "lint:api": "npm --prefix backend run lint",
+    "check:all": "npm run lint:api && npm run test:api && npm run test:e2e",
     "test:api": "npm --prefix backend run test",
     "test:e2e": "npm --prefix backend run test:e2e",
     "seed:api": "npm --prefix backend run seed",

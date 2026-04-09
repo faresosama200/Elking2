@@ -9,6 +9,7 @@
     "prisma:generate": "node node_modules/prisma/build/index.js generate",
     "prisma:push": "node node_modules/prisma/build/index.js db push",
     "seed": "node src/seed.js",
+    "lint": "node node_modules/eslint/bin/eslint.js \"src/**/*.js\" \"tests/**/*.js\"",
     "test": "node node_modules/vitest/vitest.mjs run",
     "test:watch": "node node_modules/vitest/vitest.mjs",
     "test:e2e": "node node_modules/@playwright/test/cli.js test"
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "eslint": "^9.38.0",
     "nodemon": "^3.1.14",
     "prisma": "^6.16.3",
     "supertest": "^7.2.2",
