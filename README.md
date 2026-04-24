@@ -70,6 +70,11 @@ npm run dev:api
 
 - افتح صفحات الواجهة من جذر المشروع عبر أي Static Server (مثل VS Code Live Server).
 
+- تشغيل سريع بضغطة واحدة على Windows:
+
+	- اضغط مرتين على `run-project.bat` من جذر المشروع.
+	- سيقوم بتشغيل Backend + Frontend وفتح صفحة الدخول تلقائياً في المتصفح.
+
 ## الاختبارات
 
 - تشغيل اختبارات الخادم الخلفي:
@@ -108,3 +113,9 @@ npm run lint:api
 - الانتقال من SQLite إلى قاعدة بيانات إنتاجية عند التوسع
 - إعداد مدير عمليات (PM2 أو Docker أو Service Manager)
 - توحيد مسار الـ API في الواجهة (Node أو PHP) وإيقاف الاعتماد على fallback قبل التسليم النهائي
+- استخدام `backend/.env.production.example` كمرجع لإعداد متغيرات بيئة الإنتاج
+
+## CI/CD
+
+- يوجد فحص تلقائي عند كل push و pull request عبر GitHub Actions في `.github/workflows/ci-check.yml`.
+- هذا الفحص ينفذ: Prisma generate/push ثم `npm run check:all`.

@@ -4,215 +4,244 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>طلبات التوظيف | TalentHub</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../../dashbord/admin-shared.css">
+
+<style>
+body { background: #f5f6fa; }
+
+.card-clean {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.table thead {
+  background: #f1f2f6;
+}
+
+.badge {
+  font-size: 12px;
+}
+</style>
 </head>
-<body class="bg-light">
+
+<body>
+
 <script>
 (function () {
-	var token = localStorage.getItem("th_token");
-	var user = JSON.parse(localStorage.getItem("th_user") || "null");
-	if (!token || !user || user.role !== "COMPANY") {
-		window.location.replace("../../login/login.html");
-	}
+  var token = localStorage.getItem("th_token");
+  var user = JSON.parse(localStorage.getItem("th_user") || "null");
+  if (!token || !user || user.role !== "COMPANY") {
+    window.location.replace("../../login/login.html");
+  }
 }());
 </script>
 
-<div class="container py-5">
-	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h3>طلبات التوظيف</h3>
-		<div class="d-flex gap-2">
-			<select id="pageSize" class="form-select">
-				<option value="10" selected>10 لكل صفحة</option>
-				<option value="20">20 لكل صفحة</option>
-				<option value="50">50 لكل صفحة</option>
-			</select>
-			<select id="statusFilter" class="form-select">
-				<option value="">كل الحالات</option>
-				<option value="PENDING">قيد الانتظار</option>
-				<option value="REVIEWED">تمت المراجعة</option>
-				<option value="ACCEPTED">مقبول</option>
-				<option value="REJECTED">مرفوض</option>
-			</select>
-			<a href="dashboard.html" class="btn btn-outline-secondary">العودة</a>
-		</div>
-	</div>
+<!--  Navbar  -->
+<nav class="navbar navbar-expand-lg custom-navbar">
+<div class="container">
+<a class="navbar-brand logo" href="dashboard.html">TalentHub</a>
 
-	<div class="table-responsive bg-white shadow-sm rounded p-3">
-		<table class="table table-hover align-middle">
-			<thead>
-				<tr>
-					<th>الوظيفة</th>
-					<th>اسم الطالب</th>
-					<th>البريد</th>
-					<th>الحالة</th>
-					<th>سجل المراجعة</th>
-					<th>تغيير الحالة</th>
-				</tr>
-			</thead>
-			<tbody id="tbody"><tr><td colspan="6" class="text-center text-muted">جاري التحميل...</td></tr></tbody>
-		</table>
-		<div class="d-flex justify-content-between align-items-center mt-3" id="pager"></div>
-	</div>
+<button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#menu">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="menu">
+<ul class="navbar-nav ms-auto">
+
+<li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
+<li class="nav-item"><a class="nav-link" href="post-job.html">نشر وظيفة</a></li>
+<li class="nav-item"><a class="nav-link" href="my-jobs.html">وظائفي</a></li>
+<li class="nav-item"><a class="nav-link active" href="applications.html">الطلبات</a></li>
+<li class="nav-item"><a class="nav-link" href="company-profile.html">ملفي</a></li>
+
+<li class="nav-item ms-3">
+<button class="btn btn-danger btn-sm" onclick="logout()">تسجيل الخروج</button>
+</li>
+
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="container mt-5">
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h4>طلبات التوظيف</h4>
+
+<div class="d-flex gap-2">
+
+<select id="pageSize" class="form-select form-select-sm">
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="50">50</option>
+</select>
+
+<select id="statusFilter" class="form-select form-select-sm">
+<option value="">كل الحالات</option>
+<option value="PENDING">قيد الانتظار</option>
+<option value="REVIEWED">مراجعة</option>
+<option value="ACCEPTED">مقبول</option>
+<option value="REJECTED">مرفوض</option>
+</select>
+
+</div>
 </div>
 
-<div class="modal fade" id="auditModal" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-scrollable">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">سجل مراجعة الطلب</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<div class="table-responsive">
-					<table class="table table-sm align-middle">
-						<thead>
-							<tr>
-								<th>من</th>
-								<th>إلى</th>
-								<th>بواسطة</th>
-								<th>وقت التغيير</th>
-							</tr>
-						</thead>
-						<tbody id="auditBody"><tr><td colspan="4" class="text-center text-muted">اختر طلباً لعرض السجل.</td></tr></tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+<!-- Table -->
+<div class="card-clean">
+
+<div class="table-responsive">
+<table class="table align-middle">
+<thead>
+<tr>
+<th>الوظيفة</th>
+<th>الطالب</th>
+<th>الإيميل</th>
+<th>الحالة</th>
+<th>السجل</th>
+<th>تحكم</th>
+</tr>
+</thead>
+
+<tbody id="tbody">
+<tr><td colspan="6" class="text-center text-muted">جاري التحميل...</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="d-flex justify-content-between mt-3" id="pager"></div>
+
+</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="auditModal">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5>سجل التغييرات</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+<table class="table">
+<thead>
+<tr>
+<th>من</th>
+<th>إلى</th>
+<th>بواسطة</th>
+<th>وقت</th>
+</tr>
+</thead>
+
+<tbody id="auditBody"></tbody>
+</table>
+</div>
+</div>
+</div>
 </div>
 
 <script src="../../dashbord/api.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-if (!requireRole("COMPANY")) {
-	throw new Error("redirect");
-}
+if (!requireRole("COMPANY")) throw new Error("redirect");
 
 let currentPage = 1;
 let pageLimit = 10;
 let auditModal;
 
 function statusBadgeClass(status) {
-	if (status === "ACCEPTED") return "bg-success";
-	if (status === "REJECTED") return "bg-danger";
-	if (status === "REVIEWED") return "bg-info text-dark";
-	return "bg-warning text-dark";
+  if (status === "ACCEPTED") return "bg-success";
+  if (status === "REJECTED") return "bg-danger";
+  if (status === "REVIEWED") return "bg-info text-dark";
+  return "bg-warning text-dark";
 }
 
 function openAudit(id) {
-	if (!auditModal) {
-		auditModal = new bootstrap.Modal(document.getElementById("auditModal"));
-	}
-	auditModal.show();
-	loadAudit(id);
+  if (!auditModal) {
+    auditModal = new bootstrap.Modal(document.getElementById("auditModal"));
+  }
+  auditModal.show();
+  loadAudit(id);
 }
 
 async function loadAudit(id) {
-	const body = document.getElementById("auditBody");
-	body.innerHTML = '<tr><td colspan="4" class="text-center text-muted">جاري التحميل...</td></tr>';
-	try {
-		const data = await apiFetch("/applications/" + id + "/history");
-		const items = data.items || [];
-		if (!items.length) {
-			body.innerHTML = '<tr><td colspan="4" class="text-center text-muted">لا يوجد سجل تغييرات بعد.</td></tr>';
-			return;
-		}
+  const body = document.getElementById("auditBody");
+  body.innerHTML = "<tr><td colspan='4'>جاري التحميل...</td></tr>";
 
-		body.innerHTML = items.map(function (row) {
-			const actor = row.changedBy && row.changedBy.fullName
-				? row.changedBy.fullName + " (" + arRole(row.changedBy.role || "") + ")"
-				: "-";
-			const at = row.changedAt ? new Date(row.changedAt).toLocaleString("ar-EG") : "-";
-			return "<tr>"
-				+ "<td>" + arStatus(row.fromStatus) + "</td>"
-				+ "<td>" + arStatus(row.toStatus) + "</td>"
-				+ "<td>" + actor + "</td>"
-				+ "<td>" + at + "</td>"
-				+ "</tr>";
-		}).join("");
-	} catch (e) {
-		body.innerHTML = '<tr><td colspan="4" class="text-center text-danger">' + (e.message || "فشل تحميل السجل") + '</td></tr>';
-	}
+  try {
+    const data = await apiFetch("/applications/" + id + "/history");
+    const items = data.items || [];
+
+    body.innerHTML = items.map(row => `
+      <tr>
+        <td>${arStatus(row.fromStatus)}</td>
+        <td>${arStatus(row.toStatus)}</td>
+        <td>${row.changedBy?.fullName || "-"}</td>
+        <td>${new Date(row.changedAt).toLocaleString()}</td>
+      </tr>
+    `).join("");
+
+  } catch (e) {
+    body.innerHTML = "<tr><td colspan='4'>خطأ</td></tr>";
+  }
 }
 
 async function setStatus(id, status) {
-	try {
-		await apiFetch("/applications/" + id, {
-			method: "PUT",
-			body: JSON.stringify({ status: status })
-		});
-		showToast("تم تحديث الحالة", "success");
-		await loadApplications();
-	} catch (e) {
-		showToast(e.message || "فشل تحديث الحالة", "error");
-	}
-}
+  try {
+    await apiFetch("/applications/" + id, {
+      method: "PUT",
+      body: JSON.stringify({ status })
+    });
 
-function renderPager(pagination) {
-	const pager = document.getElementById("pager");
-	if (!pagination || pagination.totalPages <= 1) {
-		pager.innerHTML = "";
-		return;
-	}
+    showToast("تم التحديث", "success");
+    loadApplications();
 
-	pager.innerHTML = `
-		<span>صفحة ${pagination.page} من ${pagination.totalPages} - إجمالي ${pagination.total} طلب</span>
-		<div class="d-flex gap-2">
-			<button class="btn btn-sm btn-outline-secondary" ${pagination.page <= 1 ? "disabled" : ""} onclick="goPage(${pagination.page - 1})">السابق</button>
-			<button class="btn btn-sm btn-outline-secondary" ${pagination.page >= pagination.totalPages ? "disabled" : ""} onclick="goPage(${pagination.page + 1})">التالي</button>
-		</div>
-	`;
-}
-
-function goPage(page) {
-	if (page < 1) return;
-	currentPage = page;
-	loadApplications();
+  } catch (e) {
+    showToast("فشل", "error");
+  }
 }
 
 async function loadApplications() {
-	try {
-		const status = document.getElementById("statusFilter").value;
-		const query = status ? ("&status=" + encodeURIComponent(status)) : "";
-		const data = await apiFetch("/applications?page=" + currentPage + "&limit=" + pageLimit + query);
-		const rows = (data.items || []).map(function (a) {
-			return `
-				<tr>
-					<td>${a.job?.title || "-"}</td>
-					<td>${a.student?.fullName || "-"}</td>
-					<td>${a.student?.email || "-"}</td>
-					<td><span class="badge ${statusBadgeClass(a.status)}">${arStatus(a.status)}</span></td>
-					<td><button class="btn btn-sm btn-outline-dark" onclick="openAudit('${a.id}')">عرض السجل</button></td>
-					<td class="d-flex gap-1">
-						<button class="btn btn-sm btn-outline-info" onclick="setStatus('${a.id}','REVIEWED')">مراجعة</button>
-						<button class="btn btn-sm btn-outline-success" onclick="setStatus('${a.id}','ACCEPTED')">قبول</button>
-						<button class="btn btn-sm btn-outline-danger" onclick="setStatus('${a.id}','REJECTED')">رفض</button>
-					</td>
-				</tr>
-			`;
-		});
+  const status = document.getElementById("statusFilter").value;
+  const data = await apiFetch(`/applications?page=${currentPage}&limit=${pageLimit}&status=${status}`);
 
-		document.getElementById("tbody").innerHTML = rows.length
-			? rows.join("")
-			: '<tr><td colspan="6" class="text-center text-muted">لا توجد طلبات حالياً</td></tr>';
-		renderPager(data.pagination);
-	} catch (e) {
-		document.getElementById("tbody").innerHTML = '<tr><td colspan="6" class="text-center text-danger">' + (e.message || "فشل التحميل") + '</td></tr>';
-		renderPager(null);
-	}
+  const rows = (data.items || []).map(a => `
+<tr>
+<td>${a.job?.title || "-"}</td>
+<td>${a.student?.fullName || "-"}</td>
+<td>${a.student?.email || "-"}</td>
+<td><span class="badge ${statusBadgeClass(a.status)}">${arStatus(a.status)}</span></td>
+<td><button class="btn btn-sm btn-dark" onclick="openAudit('${a.id}')">عرض</button></td>
+<td class="d-flex gap-1">
+<button class="btn btn-sm btn-info" onclick="setStatus('${a.id}','REVIEWED')">مراجعة</button>
+<button class="btn btn-sm btn-success" onclick="setStatus('${a.id}','ACCEPTED')">قبول</button>
+<button class="btn btn-sm btn-danger" onclick="setStatus('${a.id}','REJECTED')">رفض</button>
+</td>
+</tr>
+`);
+
+  document.getElementById("tbody").innerHTML = rows.join("");
 }
 
-document.getElementById("statusFilter").addEventListener("change", function () {
-	currentPage = 1;
-	loadApplications();
-});
+document.getElementById("statusFilter").onchange = () => {
+  currentPage = 1;
+  loadApplications();
+};
 
-document.getElementById("pageSize").addEventListener("change", function () {
-	pageLimit = Number(this.value) || 10;
-	currentPage = 1;
-	loadApplications();
-});
+document.getElementById("pageSize").onchange = function () {
+  pageLimit = this.value;
+  loadApplications();
+};
+
 loadApplications();
 </script>
+
 </body>
 </html>

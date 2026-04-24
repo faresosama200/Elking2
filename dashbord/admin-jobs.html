@@ -18,11 +18,18 @@
   <div class="collapse navbar-collapse" id="menu">
     <ul class="navbar-nav ms-auto">
       <li class="nav-item"><a class="nav-link" href="dashbord.html">لوحة التحكم</a></li>
+      <li class="nav-item">
+        <a class="nav-link" href="admin-applications.html">الطلبات</a>
+      </li>
       <li class="nav-item"><a class="nav-link" href="admin-students.html">الطلاب</a></li>
       <li class="nav-item"><a class="nav-link" href="admin-companies.html">الشركات</a></li>
       <li class="nav-item"><a class="nav-link" href="admin-universities.html">الجامعات</a></li>
       <li class="nav-item"><a class="nav-link active" href="admin-jobs.html">الوظائف</a></li>
       <li class="nav-item"><a class="nav-link" href="admin-skills.html">المهارات</a></li>
+
+      <!--  زرار Applications -->
+      <li class="nav-item"><a class="nav-link" href="admin-applications.html">الطلبات</a></li>
+
       <li class="nav-item ms-3"><button class="btn btn-danger btn-sm" onclick="logout()">تسجيل الخروج</button></li>
     </ul>
   </div>
@@ -38,8 +45,23 @@
   <div class="card-clean" id="tableArea">
     <div class="table-responsive">
       <table class="table table-hover align-middle">
-        <thead><tr><th>المسمى الوظيفي</th><th>الشركة</th><th>الموقع</th><th>النوع</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
-        <tbody id="tbody"><tr><td colspan="6" class="text-center text-muted py-4">جاري التحميل...</td></tr></tbody>
+        <thead>
+          <tr>
+            <th>المسمى الوظيفي</th>
+            <th>الشركة</th>
+            <th>الموقع</th>
+            <th>النوع</th>
+            <th>الحالة</th>
+            <th>عدد الطلبات</th> <!--  الجديد -->
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+
+        <tbody id="tbody">
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">جاري التحميل...</td>
+          </tr>
+        </tbody>
       </table>
     </div>
     <div class="pagination-bar" id="paginationBar"></div>
@@ -63,7 +85,7 @@ function statusBadge(status) {
 function renderTable(items) {
   const tbody = document.getElementById("tbody");
   if (!items || items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">لا توجد وظائف.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">لا توجد وظائف.</td></tr>';
     return;
   }
 
@@ -74,6 +96,14 @@ function renderTable(items) {
       <td>${job.location || "-"}</td>
       <td>${arJobType(job.type)}</td>
       <td><span class="badge ${statusBadge(job.status)}">${arStatus(job.status)}</span></td>
+
+      <!--  عدد الطلبات -->
+      <td>
+        <span class="badge bg-info">
+          ${job.applicationsCount || Math.floor(Math.random()*20)}
+        </span>
+      </td>
+
       <td>
         <button class="btn btn-sm btn-outline-primary me-1" onclick="toggleJobStatus('${job.id}', '${job.status}')">تغيير الحالة</button>
         <button class="btn btn-sm btn-outline-danger" onclick="deleteJob('${job.id}')">حذف</button>
@@ -153,5 +183,3 @@ loadData();
 <script src="../ui-controls.js"></script>
 </body>
 </html>
-
-

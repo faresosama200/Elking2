@@ -41,6 +41,9 @@ module.exports = [
       ecmaVersion: "latest",
       sourceType: "module",
       globals: {
+        window: "readonly",
+        document: "readonly",
+        localStorage: "readonly",
         process: "readonly",
         module: "readonly",
         require: "readonly",

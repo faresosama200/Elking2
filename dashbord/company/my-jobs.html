@@ -4,88 +4,116 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>وظائفي | TalentHub</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../../dashbord/admin-shared.css">
+
 <style>
-body { background: #f4f7fb; }
-.page-shell { max-width: 1150px; }
-.toolbar-card, .table-card { border: 0; border-radius: 22px; box-shadow: 0 12px 28px rgba(16, 24, 40, 0.08); }
-.status-chip { min-width: 86px; }
+body { background: #f5f6fa; }
+
+.card-clean {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.status-chip {
+  min-width: 80px;
+}
 </style>
 </head>
+
 <body>
+
 <script>
 (function () {
-	var token = localStorage.getItem("th_token");
-	var user = JSON.parse(localStorage.getItem("th_user") || "null");
-	if (!token || !user || user.role !== "COMPANY") {
-		window.location.replace("../../login/login.html");
-	}
+  var token = localStorage.getItem("th_token");
+  var user = JSON.parse(localStorage.getItem("th_user") || "null");
+  if (!token || !user || user.role !== "COMPANY") {
+    window.location.replace("../../login/login.html");
+  }
 }());
 </script>
 
-<nav class="navbar navbar-expand-lg bg-white border-bottom">
-	<div class="container">
-		<a class="navbar-brand fw-bold" href="dashboard.html">TalentHub</a>
-		<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
-		<div class="collapse navbar-collapse" id="menu">
-			<ul class="navbar-nav ms-auto">
-				<li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
-				<li class="nav-item"><a class="nav-link" href="post-job.html">نشر وظيفة</a></li>
-				<li class="nav-item"><a class="nav-link active" href="my-jobs.html">وظائفي</a></li>
-				<li class="nav-item"><a class="nav-link" href="applications.html">الطلبات</a></li>
-				<li class="nav-item"><a class="nav-link" onclick="logout()" style="cursor:pointer">تسجيل الخروج</a></li>
-			</ul>
-		</div>
-	</div>
+<!--  Navbar -->
+<nav class="navbar navbar-expand-lg custom-navbar">
+<div class="container">
+<a class="navbar-brand logo" href="dashboard.html">TalentHub</a>
+
+<button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#menu">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="menu">
+<ul class="navbar-nav ms-auto">
+
+<li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
+<li class="nav-item"><a class="nav-link" href="post-job.html">نشر وظيفة</a></li>
+<li class="nav-item"><a class="nav-link active" href="my-jobs.html">وظائفي</a></li>
+<li class="nav-item"><a class="nav-link" href="applications.html">الطلبات</a></li>
+<li class="nav-item"><a class="nav-link" href="company-profile.html">ملفي</a></li>
+
+<li class="nav-item ms-3">
+<button class="btn btn-danger btn-sm" onclick="logout()">تسجيل الخروج</button>
+</li>
+
+</ul>
+</div>
+</div>
 </nav>
 
-<main class="container page-shell py-5">
-	<div id="toast-container"></div>
+<div class="container mt-5">
 
-	<section class="card toolbar-card mb-4">
-		<div class="card-body p-4">
-			<div class="d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-lg-center">
-				<div>
-					<p class="text-muted mb-1">إدارة الوظائف</p>
-					<h1 class="h4 mb-0">وظائف الشركة المنشورة</h1>
-				</div>
-				<div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
-					<input id="searchInput" class="form-control" placeholder="ابحث بالمسمى أو الموقع">
-					<select id="statusFilter" class="form-select">
-						<option value="">كل الحالات</option>
-						<option value="OPEN">مفتوحة</option>
-						<option value="CLOSED">مغلقة</option>
-					</select>
-					<a href="post-job.html" class="btn btn-primary">إضافة وظيفة</a>
-				</div>
-			</div>
-		</div>
-	</section>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h4>وظائفك المنشورة</h4>
 
-	<section class="card table-card">
-		<div class="card-body p-4">
-			<div class="table-responsive">
-				<table class="table table-hover align-middle mb-0">
-					<thead>
-						<tr>
-							<th>المسمى الوظيفي</th>
-							<th>الموقع</th>
-							<th>النوع</th>
-							<th>الحالة</th>
-							<th>الوصف</th>
-							<th>الإجراءات</th>
-						</tr>
-					</thead>
-					<tbody id="tbody"><tr><td colspan="6" class="text-center text-muted py-4">جاري التحميل...</td></tr></tbody>
-				</table>
-			</div>
-			<div class="d-flex justify-content-between align-items-center mt-3" id="pager"></div>
-		</div>
-	</section>
-</main>
+<div class="d-flex gap-2">
+
+<input id="searchInput" class="form-control form-control-sm" placeholder="ابحث...">
+
+<select id="statusFilter" class="form-select form-select-sm">
+<option value="">كل الحالات</option>
+<option value="OPEN">مفتوحة</option>
+<option value="CLOSED">مغلقة</option>
+</select>
+
+<a href="post-job.html" class="btn btn-primary btn-sm">+ وظيفة</a>
+
+</div>
+</div>
+
+<!-- Table -->
+<div class="card-clean">
+
+<div class="table-responsive">
+<table class="table align-middle">
+<thead>
+<tr>
+<th>المسمى</th>
+<th>الموقع</th>
+<th>النوع</th>
+<th>الحالة</th>
+<th>الوصف</th>
+<th>تحكم</th>
+</tr>
+</thead>
+
+<tbody id="tbody">
+<tr><td colspan="6" class="text-center text-muted">جاري التحميل...</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="d-flex justify-content-between mt-3" id="pager"></div>
+
+</div>
+
+</div>
 
 <script src="../../dashbord/api.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 if (!requireRole("COMPANY")) throw new Error("redirect");
 
@@ -93,110 +121,77 @@ let currentPage = 1;
 const pageLimit = 10;
 let searchQuery = "";
 let statusFilter = "";
-let searchTimer;
+let timer;
 
 function statusBadgeClass(status) {
-	return status === "OPEN" ? "bg-success" : "bg-secondary";
+  return status === "OPEN" ? "bg-success" : "bg-secondary";
 }
 
 function shorten(text) {
-	if (!text) return "-";
-	return text.length > 100 ? text.slice(0, 100) + "..." : text;
+  return text && text.length > 80 ? text.slice(0, 80) + "..." : (text || "-");
 }
 
-function renderPager(pagination) {
-	const pager = document.getElementById("pager");
-	if (!pagination || pagination.totalPages <= 1) {
-		pager.innerHTML = "";
-		return;
-	}
-
-	pager.innerHTML = "<span class='text-muted small'>صفحة " + pagination.page + " من " + pagination.totalPages + " - إجمالي " + pagination.total + " وظيفة</span>"
-		+ "<div class='d-flex gap-2'>"
-		+ "<button class='btn btn-sm btn-outline-secondary' " + (pagination.page <= 1 ? "disabled" : "") + " onclick='goPage(" + (pagination.page - 1) + ")'>السابق</button>"
-		+ "<button class='btn btn-sm btn-outline-secondary' " + (pagination.page >= pagination.totalPages ? "disabled" : "") + " onclick='goPage(" + (pagination.page + 1) + ")'>التالي</button>"
-		+ "</div>";
-}
-
-function goPage(page) {
-	if (page < 1) return;
-	currentPage = page;
-	loadJobs();
-}
-
-async function toggleStatus(id, currentStatus) {
-	const nextStatus = currentStatus === "OPEN" ? "CLOSED" : "OPEN";
-	try {
-		await apiFetch("/jobs/" + id, {
-			method: "PUT",
-			body: JSON.stringify({ status: nextStatus })
-		});
-		showToast("تم تحديث حالة الوظيفة", "success");
-		loadJobs();
-	} catch (error) {
-		showToast(error.message || "فشل تحديث الحالة", "error");
-	}
+async function toggleStatus(id, current) {
+  const next = current === "OPEN" ? "CLOSED" : "OPEN";
+  await apiFetch("/jobs/" + id, {
+    method: "PUT",
+    body: JSON.stringify({ status: next })
+  });
+  showToast("تم التحديث", "success");
+  loadJobs();
 }
 
 async function deleteJob(id) {
-	if (!confirm("هل تريد حذف هذه الوظيفة؟")) return;
-	try {
-		await apiFetch("/jobs/" + id, { method: "DELETE" });
-		showToast("تم حذف الوظيفة", "success");
-		loadJobs();
-	} catch (error) {
-		showToast(error.message || "فشل حذف الوظيفة", "error");
-	}
+  if (!confirm("حذف الوظيفة؟")) return;
+  await apiFetch("/jobs/" + id, { method: "DELETE" });
+  showToast("تم الحذف", "success");
+  loadJobs();
 }
 
 async function loadJobs() {
-	try {
-		const query = searchQuery ? "&q=" + encodeURIComponent(searchQuery) : "";
-		const data = await apiFetch("/jobs?mine=1&page=" + currentPage + "&limit=" + pageLimit + query);
-		let items = data.items || [];
-		if (statusFilter) {
-			items = items.filter(function (job) { return job.status === statusFilter; });
-		}
+  const q = searchQuery ? "&q=" + encodeURIComponent(searchQuery) : "";
+  const data = await apiFetch(`/jobs?mine=1&page=${currentPage}&limit=${pageLimit}${q}`);
 
-		document.getElementById("tbody").innerHTML = items.length
-			? items.map(function (job) {
-					return "<tr>"
-						+ "<td><strong>" + (job.title || "-") + "</strong></td>"
-						+ "<td>" + (job.location || "-") + "</td>"
-						+ "<td>" + arJobType(job.type) + "</td>"
-						+ "<td><span class='badge status-chip " + statusBadgeClass(job.status) + "'>" + arStatus(job.status) + "</span></td>"
-						+ "<td class='text-muted'>" + shorten(job.description) + "</td>"
-						+ "<td class='d-flex gap-2'>"
-						+ "<button class='btn btn-sm btn-outline-primary' onclick='toggleStatus(\"" + job.id + "\", \"" + job.status + "\")'>" + (job.status === "OPEN" ? "إغلاق" : "إعادة فتح") + "</button>"
-						+ "<button class='btn btn-sm btn-outline-danger' onclick='deleteJob(\"" + job.id + "\")'>حذف</button>"
-						+ "</td>"
-						+ "</tr>";
-				}).join("")
-			: "<tr><td colspan='6' class='text-center text-muted py-4'>لا توجد وظائف مطابقة حالياً.</td></tr>";
+  let items = data.items || [];
 
-		renderPager(data.pagination);
-	} catch (error) {
-		document.getElementById("tbody").innerHTML = "<tr><td colspan='6' class='text-center text-danger py-4'>" + (error.message || "فشل تحميل الوظائف") + "</td></tr>";
-		renderPager(null);
-	}
+  if (statusFilter) {
+    items = items.filter(j => j.status === statusFilter);
+  }
+
+  document.getElementById("tbody").innerHTML = items.length
+    ? items.map(j => `
+<tr>
+<td><strong>${j.title}</strong></td>
+<td>${j.location}</td>
+<td>${arJobType(j.type)}</td>
+<td><span class="badge ${statusBadgeClass(j.status)}">${arStatus(j.status)}</span></td>
+<td>${shorten(j.description)}</td>
+<td class="d-flex gap-1">
+<button class="btn btn-sm btn-outline-primary" onclick="toggleStatus('${j.id}','${j.status}')">
+${j.status === "OPEN" ? "إغلاق" : "فتح"}
+</button>
+<button class="btn btn-sm btn-outline-danger" onclick="deleteJob('${j.id}')">حذف</button>
+</td>
+</tr>
+`).join("")
+    : `<tr><td colspan="6" class="text-center">لا يوجد وظائف</td></tr>`;
 }
 
-document.getElementById("searchInput").addEventListener("input", function () {
-	clearTimeout(searchTimer);
-	searchTimer = setTimeout(function () {
-		searchQuery = document.getElementById("searchInput").value.trim();
-		currentPage = 1;
-		loadJobs();
-	}, 300);
-});
+document.getElementById("searchInput").oninput = function () {
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    searchQuery = this.value;
+    loadJobs();
+  }, 300);
+};
 
-document.getElementById("statusFilter").addEventListener("change", function () {
-	statusFilter = this.value;
-	currentPage = 1;
-	loadJobs();
-});
+document.getElementById("statusFilter").onchange = function () {
+  statusFilter = this.value;
+  loadJobs();
+};
 
 loadJobs();
 </script>
+
 </body>
 </html>

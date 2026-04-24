@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تقرير مشروع التخرج - منصة تالنت هب</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
+
+  :root {
+    --primary: #0f3460;
+    --accent: #e94560;
+    --secondary: #16213e;
+    --light: #f0f4ff;
+    --gray: #6c757d;
+    --border: #dee2e6;
+    --code-bg: #1a1a2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', Arial, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.9;
+    color: #1a1a2e;
+    background: #fff;
+    direction: rtl;
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 60%, #1a1a2e 100%);
+    color: white;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+
+  .cover .logo-area {
+    width: 100px;
+    height: 100px;
+    background: rgba(233,69,96,0.2);
+    border: 3px solid #e94560;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    font-size: 42px;
+  }
+
+  .cover h1 {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .cover .subtitle {
+    font-size: 18px;
+    color: #a8b2d8;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+
+  .cover .divider {
+    width: 80px;
+    height: 3px;
+    background: #e94560;
+    margin: 24px auto;
+    border-radius: 2px;
+  }
+
+  .cover .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 40px;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .cover .meta-item {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .cover .meta-item .label {
+    font-size: 11px;
+    color: #a8b2d8;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .cover .meta-item .value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* ===== TABLE OF CONTENTS ===== */
+  .toc-page {
+    padding: 60px 60px;
+    page-break-after: always;
+  }
+
+  .toc-page h2 {
+    font-size: 26px;
+    color: var(--primary);
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 30px;
+  }
+
+  .toc-list {
+    list-style: none;
+    counter-reset: toc-counter;
+  }
+
+  .toc-list li {
+    counter-increment: toc-counter;
+    padding: 10px 0;
+    border-bottom: 1px dotted #ddd;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+  }
+
+  .toc-list li::before {
+    content: counter(toc-counter);
+    background: var(--primary);
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ===== CONTENT PAGES ===== */
+  .page {
+    padding: 50px 60px;
+    page-break-before: always;
+  }
+
+  .page-section {
+    margin-bottom: 50px;
+  }
+
+  /* ===== HEADINGS ===== */
+  .section-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--primary);
+    border-right: 5px solid var(--accent);
+    padding-right: 15px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+  }
+
+  .sub-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-right: 12px;
+    border-right: 3px solid #a8b2d8;
+  }
+
+  p { margin-bottom: 10px; color: #333; }
+
+  /* ===== HIGHLIGHT BOXES ===== */
+  .info-box {
+    background: var(--light);
+    border: 1px solid #c0ccff;
+    border-right: 4px solid var(--primary);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+
+  .warning-box {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-right: 4px solid #f9a825;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+
+  .success-box {
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    border-right: 4px solid #2e7d32;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+
+  /* ===== STAT CARDS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 20px 0;
+  }
+
+  .stat-card {
+    background: var(--light);
+    border: 1px solid #c0ccff;
+    border-radius: 10px;
+    padding: 18px 14px;
+    text-align: center;
+  }
+
+  .stat-card .num {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-card .lbl {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 6px;
+  }
+
+  /* ===== TABLES ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+
+  thead th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 14px;
+    text-align: right;
+    font-weight: 700;
+  }
+
+  tbody td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    text-align: right;
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) td { background: #f8f9fa; }
+
+  /* ===== CODE ===== */
+  code {
+    background: #eef2ff;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #c7254e;
+    direction: ltr;
+    display: inline-block;
+  }
+
+  pre {
+    background: var(--code-bg);
+    color: #cdd6f4;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow-x: auto;
+    direction: ltr;
+    text-align: left;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    border-right: 4px solid var(--accent);
+  }
+
+  pre .comment { color: #6272a4; }
+  pre .keyword { color: #ff79c6; }
+  pre .string  { color: #f1fa8c; }
+
+  /* ===== LISTS ===== */
+  ul, ol {
+    padding-right: 22px;
+    margin-bottom: 12px;
+  }
+
+  li { margin-bottom: 6px; }
+
+  .check-list { list-style: none; padding-right: 0; }
+  .check-list li::before { content: "✅  "; }
+
+  .cross-list { list-style: none; padding-right: 0; }
+  .cross-list li::before { content: "🔷  "; }
+
+  /* ===== ARCH DIAGRAM ===== */
+  .arch-box {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+    text-align: center;
+  }
+
+  .arch-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+
+  .arch-node {
+    background: var(--primary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 120px;
+  }
+
+  .arch-node.accent { background: var(--accent); }
+  .arch-node.gray   { background: var(--gray); }
+  .arch-node.green  { background: #2e7d32; }
+
+  .arch-arrow {
+    text-align: center;
+    font-size: 20px;
+    color: var(--gray);
+    margin: 6px 0;
+  }
+
+  /* ===== BADGE ===== */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+  .badge-green  { background: #dcfce7; color: #15803d; }
+  .badge-red    { background: #fee2e2; color: #dc2626; }
+  .badge-purple { background: #f3e8ff; color: #7c3aed; }
+  .badge-orange { background: #fff7ed; color: #c2410c; }
+
+  /* ===== ROLE CARDS ===== */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin: 16px 0;
+  }
+
+  .role-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .role-card .role-header {
+    background: var(--primary);
+    color: white;
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .role-card.accent .role-header { background: var(--accent); }
+  .role-card.green  .role-header { background: #2e7d32; }
+  .role-card.purple .role-header { background: #7c3aed; }
+
+  .role-card ul {
+    padding: 12px 20px;
+    margin: 0;
+  }
+
+  .role-card li { font-size: 12.5px; margin-bottom: 4px; }
+
+  /* ===== HEADER / FOOTER ===== */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+  }
+
+  .page-header .title { font-size: 20px; font-weight: 900; color: var(--primary); }
+  .page-header .num   { font-size: 13px; color: var(--gray); }
+
+  hr.section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* ===== PRINT ===== */
+  @media print {
+    body { font-size: 12px; }
+    .cover { min-height: auto; padding: 40px; }
+    .cover h1 { font-size: 34px; }
+    .page { padding: 30px 40px; }
+    .toc-page { padding: 30px 40px; }
+    pre { background: #222; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    thead th { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: var(--primary) !important; }
+    .arch-node { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .role-card .role-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { margin: 1.5cm; size: A4; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="logo-area">💼</div>
+  <h1>TalentHub</h1>
+  <div class="subtitle">منصة متكاملة لإدارة التوظيف والمهارات</div>
+  <div class="divider"></div>
+  <div style="font-size:20px;color:#cdd6f4;font-weight:300">تقرير مشروع التخرج</div>
+  <div style="font-size:14px;color:#a8b2d8;margin-top:8px">وصف كامل للمشروع — معماريته — تقنياته — ميزاته</div>
+
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="label">المشروع</div>
+      <div class="value">TalentHub</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">نوع المشروع</div>
+      <div class="value">مشروع تخرج</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">التقنية الأساسية</div>
+      <div class="value">Node.js + Express</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">قاعدة البيانات</div>
+      <div class="value">SQLite / PostgreSQL</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">اللغة الأمامية</div>
+      <div class="value">HTML5 + Bootstrap 5</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">الاختبارات</div>
+      <div class="value">Vitest + Playwright</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== فهرس ==================== -->
+<div class="toc-page">
+  <h2>📋 فهرس المحتويات</h2>
+  <ol class="toc-list">
+    <li>نظرة عامة على المشروع ورؤيته</li>
+    <li>المعمارية التقنية والتقنيات المستخدمة</li>
+    <li>هيكل الملفات والمجلدات</li>
+    <li>نموذج قاعدة البيانات والكيانات</li>
+    <li>واجهة برمجة التطبيقات (نقاط النهاية)</li>
+    <li>أدوار المستخدمين وصلاحياتهم</li>
+    <li>الواجهة الأمامية ولوحات التحكم</li>
+    <li>نظام المصادقة والأمان</li>
+    <li>الاختبارات وضمان الجودة</li>
+    <li>كيفية تشغيل المشروع</li>
+    <li>النشر على السحابة</li>
+    <li>الخلاصة ونقاط القوة</li>
+  </ol>
+</div>
+
+<!-- ==================== 1. نظرة عامة ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">١. نظرة عامة على المشروع</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-title">ما هي منصة تالنت هب؟</h2>
+    <p>
+      منصة <strong>تالنت هب</strong> هي نظام متكامل لإدارة التوظيف والمهارات، مصمّم ليربط بين ثلاثة أطراف رئيسية: <strong>الطلاب</strong> الباحثين عن فرص عمل، و<strong>الشركات</strong> المُعلِنة عن وظائف، و<strong>الجامعات</strong> الراعية لطلابها — وكل ذلك تحت إشراف <strong>مسؤول النظام</strong>.
+    </p>
+    <p>
+      تدعم المنصة اللغة العربية بالكامل كلغة أساسية مع دعم اتجاه النص من اليمين لليسار، كما تتيح التبديل بين الوضع الفاتح والداكن وتدعم اللغة الإنجليزية كخيار ثانوي.
+    </p>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="num">٤</div><div class="lbl">أدوار مستخدمين</div></div>
+      <div class="stat-card"><div class="num">٨</div><div class="lbl">كيانات في قاعدة البيانات</div></div>
+      <div class="stat-card"><div class="num">٢٥+</div><div class="lbl">نقطة نهاية API</div></div>
+      <div class="stat-card"><div class="num">٦</div><div class="lbl">اختبارات آلية تنجح</div></div>
+    </div>
+
+    <h2 class="section-title">الهدف من المشروع</h2>
+    <ul class="check-list">
+      <li>توفير منصة رقمية مركزية تجمع سوق العمل والتعليم الجامعي</li>
+      <li>تمكين الطالب من عرض مهاراته والتقدم للوظائف مباشرة</li>
+      <li>تمكين الشركات من نشر فرص العمل وتصفية المتقدمين</li>
+      <li>تمكين الجامعات من متابعة الطلاب المنتسبين إليها</li>
+      <li>إتاحة لوحة إدارة شاملة للمسؤول للإشراف على النظام بالكامل</li>
+    </ul>
+
+    <h2 class="section-title">أبرز الميزات</h2>
+    <div class="roles-grid">
+      <div class="info-box">
+        <strong>🔐 المصادقة الأمنية</strong><br>
+        نظام تسجيل دخول بـ JWT مع رموز وصول (١٥ دقيقة) ورموز تجديد (٧ أيام)، وتشفير كلمات المرور بـ bcrypt
+      </div>
+      <div class="info-box">
+        <strong>📊 لوحات التحكم المتعددة</strong><br>
+        لكل دور لوحة تحكم مخصصة بصلاحيات محددة، تُعرض بعد تسجيل الدخول تلقائياً
+      </div>
+      <div class="info-box">
+        <strong>🌐 واجهة عربية كاملة</strong><br>
+        دعم RTL كامل مع Bootstrap 5، تبديل اللغة، وتبديل الوضع الفاتح/الداكن
+      </div>
+      <div class="info-box">
+        <strong>✅ جودة الكود</strong><br>
+        ESLint + Vitest + Playwright + GitHub Actions CI = صفر ثغرات أمنية
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 2. المعمارية ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٢. المعمارية التقنية</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <h2 class="section-title">نمط المعمارية</h2>
+  <p>يعتمد المشروع نمط <strong>MVC (نموذج - عرض - متحكم)</strong> في الطبقة الخلفية، مع فصل واضح بين طبقات التطبيق:</p>
+
+  <div class="arch-box">
+    <div class="arch-row">
+      <div class="arch-node accent">المتصفح (HTML/CSS)</div>
+      <div class="arch-node accent">Bootstrap 5 RTL</div>
+    </div>
+    <div class="arch-arrow">⬇ طلبات HTTP/AJAX ⬇</div>
+    <div class="arch-row">
+      <div class="arch-node">Middleware (Helmet + CORS)</div>
+      <div class="arch-node">Auth Middleware (JWT)</div>
+    </div>
+    <div class="arch-arrow">⬇ توجيه ⬇</div>
+    <div class="arch-row">
+      <div class="arch-node gray">Routes (auth + crud)</div>
+    </div>
+    <div class="arch-arrow">⬇ معالجة ⬇</div>
+    <div class="arch-row">
+      <div class="arch-node">Controllers</div>
+      <div class="arch-node">Validators (Zod)</div>
+    </div>
+    <div class="arch-arrow">⬇ البيانات ⬇</div>
+    <div class="arch-row">
+      <div class="arch-node green">Prisma ORM</div>
+      <div class="arch-node green">SQLite / PostgreSQL</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">التقنيات المستخدمة</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>الطبقة</th>
+        <th>التقنية</th>
+        <th>الاستخدام</th>
+        <th>النسخة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>الخادم الخلفي</td><td><code>Node.js</code></td><td>بيئة تشغيل JavaScript على الخادم</td><td>٢٠+</td></tr>
+      <tr><td>الخادم الخلفي</td><td><code>Express.js</code></td><td>إطار عمل HTTP API</td><td>٤.x</td></tr>
+      <tr><td>قاعدة البيانات</td><td><code>Prisma ORM</code></td><td>طبقة الوصول للبيانات + Migrations</td><td>٦.x</td></tr>
+      <tr><td>قاعدة البيانات</td><td><code>SQLite</code></td><td>قاعدة البيانات في التطوير</td><td>—</td></tr>
+      <tr><td>قاعدة البيانات</td><td><code>PostgreSQL</code></td><td>قاعدة البيانات في الإنتاج (السحابة)</td><td>—</td></tr>
+      <tr><td>المصادقة</td><td><code>JWT</code></td><td>رموز الوصول والتجديد</td><td>جوزة ويب JSON</td></tr>
+      <tr><td>المصادقة</td><td><code>bcrypt</code></td><td>تشفير كلمات المرور</td><td>—</td></tr>
+      <tr><td>التحقق</td><td><code>Zod</code></td><td>التحقق من مدخلات API</td><td>٣.x</td></tr>
+      <tr><td>الأمان</td><td><code>Helmet.js</code></td><td>ترويسات HTTP الأمنية</td><td>—</td></tr>
+      <tr><td>التسجيل</td><td><code>Pino</code></td><td>تسجيل السجلات (Logging)</td><td>—</td></tr>
+      <tr><td>الواجهة الأمامية</td><td><code>Bootstrap 5 RTL</code></td><td>تصميم متجاوب عربي</td><td>٥.x</td></tr>
+      <tr><td>الاختبار الوحدوي</td><td><code>Vitest + Supertest</code></td><td>اختبارات الوحدة والتكامل</td><td>—</td></tr>
+      <tr><td>اختبار المتصفح</td><td><code>Playwright</code></td><td>اختبارات E2E شاملة</td><td>—</td></tr>
+      <tr><td>جودة الكود</td><td><code>ESLint 9</code></td><td>فحص جودة الكود تلقائياً</td><td>٩.x</td></tr>
+      <tr><td>التكامل المستمر</td><td><code>GitHub Actions</code></td><td>CI/CD تلقائي عند كل رفع</td><td>—</td></tr>
+      <tr><td>النشر</td><td><code>Render.com</code></td><td>نشر سحابي مجاني</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== 3. هيكل الملفات ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٣. هيكل الملفات والمجلدات</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <div class="sub-title">هيكل الجذر</div>
+<pre>
+مشروع التخرج/
+├── backend/            ← الخادم الخلفي (Node.js + Express)
+├── dashbord/           ← لوحات التحكم (الواجهة الأمامية)
+├── login/              ← صفحة تسجيل الدخول
+├── register/           ← صفحة التسجيل
+├── dashboard/          ← لوحات تحكم إضافية
+├── php-api/            ← بديل PHP (للتجارب المحلية فقط)
+├── index.html          ← الصفحة الرئيسية (Landing Page)
+├── style.css           ← أنماط الصفحة الرئيسية
+├── ui-controls.js      ← لوحة الإعدادات العائمة
+├── run-project.bat     ← ملف التشغيل السريع (Windows)
+└── render.yaml         ← إعداد النشر السحابي
+</pre>
+
+  <div class="sub-title">هيكل الخادم الخلفي <code>backend/</code></div>
+<pre>
+backend/
+├── prisma/
+│   └── schema.prisma       ← تعريف نماذج قاعدة البيانات
+├── src/
+│   ├── app.js              ← إعداد Express (Middleware + Routes)
+│   ├── server.js           ← نقطة الدخول (تشغيل الخادم)
+│   ├── seed.js             ← زرع البيانات الابتدائية
+│   ├── utils.js            ← أدوات مساعدة مشتركة
+│   ├── config/
+│   │   ├── env.js          ← قراءة متغيرات البيئة
+│   │   ├── logger.js       ← إعداد Pino Logger
+│   │   └── prisma.js       ← عميل قاعدة البيانات
+│   ├── controllers/
+│   │   ├── auth.controller.js  ← منطق المصادقة
+│   │   └── crud.controller.js  ← منطق CRUD العام
+│   ├── middlewares/
+│   │   ├── auth.js         ← التحقق من JWT + الأذونات
+│   │   ├── error-handler.js← معالجة الأخطاء
+│   │   └── validate.js     ← التحقق من المدخلات (Zod)
+│   ├── routes/
+│   │   ├── auth.routes.js  ← مسارات المصادقة
+│   │   └── crud.routes.js  ← مسارات CRUD لكل الكيانات
+│   └── validators/
+│       ├── auth.schemas.js ← مخططات التحقق للمصادقة
+│       └── resource.schemas.js ← مخططات التحقق للموارد
+└── tests/
+    ├── unit/utils.test.js          ← اختبارات الوحدة
+    ├── integration/health-auth.test.js ← اختبارات التكامل
+    └── e2e/
+        ├── landing.spec.js         ← اختبار الصفحة الرئيسية
+        └── login.spec.js           ← اختبار تسجيل الدخول
+</pre>
+
+  <div class="sub-title">هيكل الواجهة الأمامية <code>dashbord/</code></div>
+<pre>
+dashbord/
+├── api.js                  ← تكوين API وطبقة التواصل
+├── dashbord.html/css       ← لوحة التحكم الرئيسية
+├── admin/                  ← لوحة المسؤول
+│   ├── dashbord.html       ← الرئيسية الإدارية
+│   ├── admin-students.html ← إدارة الطلاب
+│   ├── admin-companies.html← إدارة الشركات
+│   ├── admin-universities.html ← إدارة الجامعات
+│   ├── admin-jobs.html     ← إدارة الوظائف
+│   └── admin-skills.html   ← إدارة المهارات
+├── student/                ← لوحة الطالب
+│   ├── dashboard.html      ← رئيسية الطالب
+│   ├── jobs.html           ← استعراض الوظائف
+│   ├── my-applications.html← طلباتي
+│   └── my-profile.html     ← ملفي الشخصي
+├── company/                ← لوحة الشركة
+│   ├── dashboard.html
+│   ├── my-jobs.html
+│   ├── post-job.html
+│   └── applications.html
+└── university/             ← لوحة الجامعة
+    ├── dashboard.html
+    ├── students.html
+    ├── departments.html
+    └── partnerships.html
+</pre>
+</div>
+
+<!-- ==================== 4. قاعدة البيانات ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٤. نموذج قاعدة البيانات</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <p>يعتمد المشروع <strong>Prisma ORM</strong> مع قاعدة بيانات <strong>SQLite</strong> في بيئة التطوير و<strong>PostgreSQL</strong> في الإنتاج. فيما يلي الكيانات الثمانية وعلاقاتها:</p>
+
+  <table>
+    <thead>
+      <tr><th>الكيان</th><th>الحقول الرئيسية</th><th>العلاقات</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>User</strong><br><span class="badge badge-blue">المستخدم</span></td>
+        <td>id, fullName, email, passwordHash, role, status, refreshToken</td>
+        <td>يرتبط بـ Student أو Company أو University (واحد لكل)</td>
+      </tr>
+      <tr>
+        <td><strong>Student</strong><br><span class="badge badge-green">الطالب</span></td>
+        <td>id, userId, universityId, bio, status</td>
+        <td>يتبع User، ينتمي لـ University، يملك مهارات وطلبات توظيف</td>
+      </tr>
+      <tr>
+        <td><strong>Company</strong><br><span class="badge badge-orange">الشركة</span></td>
+        <td>id, userId, name, industry, status</td>
+        <td>يتبع User، يملك وظائف متعددة</td>
+      </tr>
+      <tr>
+        <td><strong>University</strong><br><span class="badge badge-purple">الجامعة</span></td>
+        <td>id, userId, name, location, status</td>
+        <td>يتبع User، يضم طلاباً متعددين</td>
+      </tr>
+      <tr>
+        <td><strong>Job</strong><br><span class="badge badge-blue">الوظيفة</span></td>
+        <td>id, companyId, title, location, type, status, description</td>
+        <td>تتبع Company، تحتاج مهارات، تستقبل طلبات</td>
+      </tr>
+      <tr>
+        <td><strong>Skill</strong><br><span class="badge badge-green">المهارة</span></td>
+        <td>id, name, category, status</td>
+        <td>تُربط بالطلاب والوظائف (Many-to-Many)</td>
+      </tr>
+      <tr>
+        <td><strong>StudentSkill</strong><br><span class="badge badge-orange">مهارات الطالب</span></td>
+        <td>studentId, skillId</td>
+        <td>جدول وسيط (Many-to-Many) بين Student و Skill</td>
+      </tr>
+      <tr>
+        <td><strong>Application</strong><br><span class="badge badge-red">طلب التوظيف</span></td>
+        <td>id, studentId, jobId, status</td>
+        <td>يربط Student بـ Job، يمنع التكرار (@@unique)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">علاقات الكيانات (مبسّطة)</div>
+  <div class="arch-box">
+    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;align-items:center;padding:10px">
+      <div style="text-align:center">
+        <div class="arch-node" style="margin-bottom:8px">User</div>
+        <div style="font-size:11px;color:#666">الحساب الأساسي</div>
+      </div>
+      <div style="font-size:22px;color:#888">→</div>
+      <div style="text-align:center;display:flex;flex-direction:column;gap:8px">
+        <div class="arch-node green" style="font-size:11px">Student</div>
+        <div class="arch-node accent" style="font-size:11px">Company</div>
+        <div class="arch-node gray"  style="font-size:11px">University</div>
+      </div>
+      <div style="font-size:22px;color:#888">→</div>
+      <div style="text-align:center;display:flex;flex-direction:column;gap:8px">
+        <div class="arch-node green" style="font-size:11px;background:#7c3aed">Skills (M:M)</div>
+        <div class="arch-node" style="font-size:11px">Jobs → Applications</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-title">قيم الحالة (Status)</div>
+  <table>
+    <thead><tr><th>الكيان</th><th>القيم المتاحة</th><th>المعنى</th></tr></thead>
+    <tbody>
+      <tr><td>User</td><td><code>ACTIVE</code> / <code>INACTIVE</code></td><td>حالة الحساب</td></tr>
+      <tr><td>Student / Company / University</td><td><code>PENDING</code> / <code>APPROVED</code> / <code>REJECTED</code></td><td>حالة الموافقة من المسؤول</td></tr>
+      <tr><td>Job</td><td><code>OPEN</code> / <code>CLOSED</code></td><td>حالة إتاحة الوظيفة</td></tr>
+      <tr><td>Application</td><td><code>PENDING</code> / <code>ACCEPTED</code> / <code>REJECTED</code></td><td>مراجعة طلب التوظيف</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== 5. API ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٥. واجهة برمجة التطبيقات (API)</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <div class="info-box">
+    <strong>عنوان القاعدة:</strong> <code>http://localhost:4000/api</code> | البروتوكول: HTTP REST | صيغة البيانات: JSON
+  </div>
+
+  <div class="sub-title">نقاط نهاية المصادقة</div>
+  <table>
+    <thead><tr><th>الطريقة</th><th>المسار</th><th>الوصف</th><th>المصادقة المطلوبة</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/auth/register</code></td><td>تسجيل مستخدم جديد</td><td>لا</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/auth/login</code></td><td>تسجيل الدخول والحصول على رموز</td><td>لا</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/auth/refresh</code></td><td>تجديد رمز الوصول</td><td>لا (refreshToken)</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/auth/me</code></td><td>بيانات المستخدم الحالي</td><td>نعم</td></tr>
+      <tr><td><span class="badge badge-green">POST</span></td><td><code>/auth/logout</code></td><td>تسجيل الخروج</td><td>نعم</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">نقاط نهاية CRUD (لكل كيان)</div>
+  <table>
+    <thead><tr><th>الطريقة</th><th>المسار</th><th>الوصف</th><th>الأدوار المسموحة</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/users</code></td><td>قائمة المستخدمين</td><td>ADMIN</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/students</code></td><td>قائمة الطلاب</td><td>ADMIN, UNIVERSITY</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/companies</code></td><td>قائمة الشركات</td><td>ADMIN</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/universities</code></td><td>قائمة الجامعات</td><td>ADMIN</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/jobs</code></td><td>قائمة الوظائف</td><td>ADMIN, STUDENT, COMPANY</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/skills</code></td><td>قائمة المهارات</td><td>ADMIN, STUDENT</td></tr>
+      <tr><td><span class="badge badge-blue">GET</span></td><td><code>/applications</code></td><td>قائمة طلبات التوظيف</td><td>ADMIN, STUDENT, COMPANY</td></tr>
+      <tr><td colspan="4" style="background:#f8f9fa;text-align:center;color:#666;font-size:12px">
+        لكل مسار أعلاه: <code>GET /:id</code> | <code>POST /</code> | <code>PUT /:id</code> | <code>DELETE /:id</code>
+      </td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">نقطة نهاية الفحص الصحي</div>
+  <table>
+    <thead><tr><th>المسار</th><th>الاستجابة</th><th>الاستخدام</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET /api/health</code></td><td><code>{"status":"ok","timestamp":"..."}</code></td><td>التحقق من أن الخادم يعمل</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">مثال على استجابة API ناجحة</div>
+<pre>
+<span class="comment">// POST /api/auth/login</span>
+<span class="comment">// الطلب:</span>
+{
+  "email": "admin@talenthub.local",
+  "password": "Admin1234"
+}
+
+<span class="comment">// الاستجابة (200):</span>
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "clxxx...",
+    "fullName": "System Administrator",
+    "email": "admin@talenthub.local",
+    "role": "ADMIN"
+  }
+}
+</pre>
+</div>
+
+<!-- ==================== 6. الأدوار ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٦. أدوار المستخدمين وصلاحياتهم</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <p>يدعم النظام أربعة أدوار متمايزة، لكل منها صلاحيات وواجهة خاصة:</p>
+
+  <div class="roles-grid" style="grid-template-columns:repeat(2,1fr);gap:16px;margin-top:20px">
+    <div class="role-card">
+      <div class="role-header">👑 المسؤول (ADMIN)</div>
+      <ul>
+        <li>عرض وإدارة جميع المستخدمين</li>
+        <li>الموافقة على تسجيل الطلاب والشركات والجامعات</li>
+        <li>إدارة المهارات وتصنيفها</li>
+        <li>عرض جميع الوظائف وطلبات التوظيف</li>
+        <li>الوصول لجميع نقاط النهاية</li>
+        <li>التوجيه إلى: <code>/dashbord/admin/dashbord.html</code></li>
+      </ul>
+    </div>
+    <div class="role-card green">
+      <div class="role-header">🎓 الطالب (STUDENT)</div>
+      <ul>
+        <li>عرض الوظائف المتاحة</li>
+        <li>التقدم للوظائف</li>
+        <li>إدارة ملفه الشخصي والمهارات</li>
+        <li>متابعة حالة طلباته</li>
+        <li>التوجيه إلى: <code>/dashbord/student/dashboard.html</code></li>
+      </ul>
+    </div>
+    <div class="role-card accent">
+      <div class="role-header">🏢 الشركة (COMPANY)</div>
+      <ul>
+        <li>نشر وظائف جديدة</li>
+        <li>إدارة الوظائف المنشورة</li>
+        <li>مراجعة طلبات الطلاب</li>
+        <li>قبول أو رفض المتقدمين</li>
+        <li>التوجيه إلى: <code>/dashbord/company/dashboard.html</code></li>
+      </ul>
+    </div>
+    <div class="role-card purple">
+      <div class="role-header">🏛️ الجامعة (UNIVERSITY)</div>
+      <ul>
+        <li>عرض الطلاب المنتسبين</li>
+        <li>متابعة نشاط الطلاب</li>
+        <li>إدارة بيانات الجامعة والأقسام</li>
+        <li>عرض الشراكات مع الشركات</li>
+        <li>التوجيه إلى: <code>/dashbord/university/dashboard.html</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sub-title">آلية التوجيه بعد تسجيل الدخول</div>
+<pre>
+<span class="comment">// في dashbord/api.js — التوجيه التلقائي حسب الدور</span>
+<span class="keyword">const</span> redirectMap = {
+  ADMIN:      <span class="string">"/dashbord/admin/dashbord.html"</span>,
+  STUDENT:    <span class="string">"/dashbord/student/dashboard.html"</span>,
+  COMPANY:    <span class="string">"/dashbord/company/dashboard.html"</span>,
+  UNIVERSITY: <span class="string">"/dashbord/university/dashboard.html"</span>
+};
+window.location.href = redirectMap[user.role];
+</pre>
+
+  <div class="sub-title">حماية المسارات في الخادم</div>
+<pre>
+<span class="comment">// middleware/auth.js — التحقق من الدور</span>
+<span class="keyword">function</span> requireRole(...roles) {
+  <span class="keyword">return</span> (req, res, next) => {
+    <span class="keyword">if</span> (!roles.includes(req.user.role)) {
+      <span class="keyword">return</span> res.status(<span class="string">403</span>).json({ error: <span class="string">"Forbidden"</span> });
+    }
+    next();
+  };
+}
+</pre>
+</div>
+
+<!-- ==================== 7. الواجهة الأمامية ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٧. الواجهة الأمامية ولوحات التحكم</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <div class="sub-title">صفحات النظام</div>
+  <table>
+    <thead><tr><th>الصفحة</th><th>المسار</th><th>الوصف</th><th>الدور</th></tr></thead>
+    <tbody>
+      <tr><td>الصفحة الرئيسية</td><td><code>/index.html</code></td><td>Landing Page للمنصة</td><td>الجميع</td></tr>
+      <tr><td>تسجيل الدخول</td><td><code>/login/login.html</code></td><td>نموذج الدخول</td><td>الجميع</td></tr>
+      <tr><td>التسجيل</td><td><code>/register/register.html</code></td><td>إنشاء حساب جديد</td><td>الجميع</td></tr>
+      <tr><td>لوحة المسؤول</td><td><code>/dashbord/admin/dashbord.html</code></td><td>الرئيسية مع إحصائيات</td><td>ADMIN</td></tr>
+      <tr><td>إدارة الطلاب</td><td><code>/dashbord/admin/admin-students.html</code></td><td>CRUD للطلاب</td><td>ADMIN</td></tr>
+      <tr><td>إدارة الشركات</td><td><code>/dashbord/admin/admin-companies.html</code></td><td>CRUD للشركات</td><td>ADMIN</td></tr>
+      <tr><td>إدارة الجامعات</td><td><code>/dashbord/admin/admin-universities.html</code></td><td>CRUD للجامعات</td><td>ADMIN</td></tr>
+      <tr><td>إدارة الوظائف</td><td><code>/dashbord/admin/admin-jobs.html</code></td><td>CRUD للوظائف</td><td>ADMIN</td></tr>
+      <tr><td>إدارة المهارات</td><td><code>/dashbord/admin/admin-skills.html</code></td><td>CRUD للمهارات</td><td>ADMIN</td></tr>
+      <tr><td>وظائف الطالب</td><td><code>/dashbord/student/jobs.html</code></td><td>استعراض والتقدم</td><td>STUDENT</td></tr>
+      <tr><td>طلبات الطالب</td><td><code>/dashbord/student/my-applications.html</code></td><td>متابعة الطلبات</td><td>STUDENT</td></tr>
+      <tr><td>ملف الطالب</td><td><code>/dashbord/student/my-profile.html</code></td><td>تعديل البيانات والمهارات</td><td>STUDENT</td></tr>
+      <tr><td>نشر وظيفة</td><td><code>/dashbord/company/post-job.html</code></td><td>إضافة وظيفة جديدة</td><td>COMPANY</td></tr>
+      <tr><td>طلاب الجامعة</td><td><code>/dashbord/university/students.html</code></td><td>قائمة الطلاب</td><td>UNIVERSITY</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">ميزات الواجهة</div>
+  <div class="roles-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="info-box">
+      <strong>🌙 الوضع الداكن/الفاتح</strong><br>
+      تبديل فوري محفوظ في LocalStorage
+    </div>
+    <div class="info-box">
+      <strong>🌐 ثنائية اللغة</strong><br>
+      عربي (RTL) وإنجليزي — تحويل آني
+    </div>
+    <div class="info-box">
+      <strong>📱 تصميم متجاوب</strong><br>
+      Bootstrap 5 — يعمل على الجوال والكمبيوتر
+    </div>
+  </div>
+
+  <div class="sub-title">آلية اكتشاف API <code>(dashbord/api.js)</code></div>
+  <p>يستخدم النظام آلية fallback ذكية لاكتشاف عنوان API تلقائياً:</p>
+<pre>
+<span class="keyword">async function</span> resolveApiBase() {
+  <span class="comment">// أولاً: جرّب Node.js backend</span>
+  <span class="keyword">try</span> {
+    <span class="keyword">await</span> fetch(<span class="string">"http://localhost:4000/api/health"</span>);
+    <span class="keyword">return</span> <span class="string">"http://localhost:4000/api"</span>;
+  } <span class="keyword">catch</span> {}
+  <span class="comment">// ثانياً: جرّب PHP backend</span>
+  <span class="keyword">return</span> <span class="string">"/php-api/index.php"</span>;
+}
+</pre>
+</div>
+
+<!-- ==================== 8. الأمان ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٨. نظام المصادقة والأمان</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <h2 class="section-title">طبقات الأمان المُطبَّقة</h2>
+
+  <table>
+    <thead><tr><th>الطبقة</th><th>الأداة</th><th>الحماية التي توفرها</th></tr></thead>
+    <tbody>
+      <tr><td>ترويسات HTTP</td><td>Helmet.js</td><td>XSS، Clickjacking، MIME sniffing، HSTS</td></tr>
+      <tr><td>سياسة الأصول</td><td>CORS مُهيَّأ</td><td>يقبل فقط النطاقات المُصرَّح بها</td></tr>
+      <tr><td>كلمات المرور</td><td>bcrypt (rounds=10)</td><td>لا تُخزَّن كلمات المرور نصياً أبداً</td></tr>
+      <tr><td>رمز الوصول</td><td>JWT (HS256)</td><td>صلاحية ١٥ دقيقة، يُرسَل في Authorization Header</td></tr>
+      <tr><td>رمز التجديد</td><td>JWT (HS256)</td><td>صلاحية ٧ أيام، يُخزَّن مُشفَّراً في قاعدة البيانات</td></tr>
+      <tr><td>التحقق من المدخلات</td><td>Zod</td><td>يرفض أي مدخل غير متوقع قبل وصوله للقاعدة</td></tr>
+      <tr><td>التحقق من الدور</td><td>requireRole middleware</td><td>يمنع الوصول غير المصرح للموارد</td></tr>
+      <tr><td>ثغرات الحزم</td><td>npm audit</td><td>صفر ثغرات (تم تحديث Vite لإصلاح ثغرة path traversal)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">دورة حياة المصادقة</div>
+  <div class="arch-box">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+      <div class="arch-node accent" style="font-size:12px">المستخدم يُسجّل / يدخل</div>
+      <div style="font-size:16px">→</div>
+      <div class="arch-node" style="font-size:12px">الخادم يتحقق بـ bcrypt</div>
+      <div style="font-size:16px">→</div>
+      <div class="arch-node green" style="font-size:12px">يُصدر accessToken (15د)</div>
+      <div style="font-size:16px">+</div>
+      <div class="arch-node green" style="font-size:12px">refreshToken (7 أيام)</div>
+    </div>
+    <div style="margin:12px 0;font-size:16px;color:#888">⬇ عند انتهاء accessToken ⬇</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+      <div class="arch-node gray" style="font-size:12px">POST /auth/refresh</div>
+      <div style="font-size:16px">→</div>
+      <div class="arch-node green" style="font-size:12px">accessToken جديد</div>
+      <div style="font-size:16px">أو</div>
+      <div class="arch-node accent" style="font-size:12px">401 → تسجيل دخول مجدداً</div>
+    </div>
+  </div>
+
+  <div class="sub-title">مثبتات الأمان في ملف البيئة <code>.env</code></div>
+<pre>
+NODE_ENV=development
+PORT=4000
+DATABASE_URL="file:../prisma/dev.db"
+JWT_SECRET=your-super-secret-key-min-32-chars
+JWT_REFRESH_SECRET=your-refresh-secret-key-min-32-chars
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+CORS_ORIGIN=http://127.0.0.1:5500
+</pre>
+
+  <div class="success-box">
+    <strong>✅ نتيجة الفحص الأمني:</strong> تم تشغيل <code>npm audit</code> وتم تصحيح جميع الثغرات — النتيجة: <strong>صفر ثغرات (0 vulnerabilities)</strong>. تم تحديث Vite من 8.0.0 إلى 8.0.8 لإصلاح ثغرة path traversal الخطيرة.
+  </div>
+</div>
+
+<!-- ==================== 9. الاختبارات ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">٩. الاختبارات وضمان الجودة</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="num" style="color:#2e7d32">6</div><div class="lbl">مجموع الاختبارات</div></div>
+    <div class="stat-card"><div class="num" style="color:#2e7d32">6/6</div><div class="lbl">اختبارات تنجح</div></div>
+    <div class="stat-card"><div class="num" style="color:#2e7d32">0</div><div class="lbl">ثغرات أمنية</div></div>
+    <div class="stat-card"><div class="num" style="color:#2e7d32">✓</div><div class="lbl">CI يعمل</div></div>
+  </div>
+
+  <h2 class="section-title">أنواع الاختبارات</h2>
+
+  <table>
+    <thead><tr><th>النوع</th><th>الأداة</th><th>الملف</th><th>ما يختبره</th><th>النتيجة</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge badge-blue">وحدة</span></td>
+        <td>Vitest</td>
+        <td><code>tests/unit/utils.test.js</code></td>
+        <td>دوال الأدوات المساعدة</td>
+        <td><span class="badge badge-green">✓ نجاح</span></td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-orange">تكامل</span></td>
+        <td>Vitest + Supertest</td>
+        <td><code>tests/integration/health-auth.test.js</code></td>
+        <td>Health endpoint + تسجيل + دخول</td>
+        <td><span class="badge badge-green">✓ نجاح</span></td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">E2E</span></td>
+        <td>Playwright</td>
+        <td><code>tests/e2e/landing.spec.js</code></td>
+        <td>الصفحة الرئيسية — ظهور زر CTA</td>
+        <td><span class="badge badge-green">✓ نجاح</span></td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">E2E</span></td>
+        <td>Playwright</td>
+        <td><code>tests/e2e/login.spec.js</code></td>
+        <td>تسجيل الدخول + التوجيه حسب الدور</td>
+        <td><span class="badge badge-green">✓ نجاح</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">أوامر الاختبار</div>
+<pre>
+<span class="comment"># تشغيل جميع الاختبارات + Lint دفعة واحدة</span>
+npm run check:all
+
+<span class="comment"># اختبارات الخادم الخلفي فقط (Vitest)</span>
+npm run test:api
+
+<span class="comment"># اختبارات المتصفح (Playwright E2E)</span>
+npm run test:e2e
+
+<span class="comment"># فحص جودة الكود (ESLint)</span>
+npm run lint:api
+</pre>
+
+  <div class="sub-title">التكامل المستمر (GitHub Actions)</div>
+  <p>يوجد ملف <code>.github/workflows/ci-check.yml</code> يُنفَّذ تلقائياً عند كل رفع (push) أو طلب دمج (pull request) على فروع <code>master</code> و<code>main</code>:</p>
+<pre>
+<span class="comment"># خطوات CI تلقائياً:</span>
+1. تثبيت Node.js 20
+2. تثبيت حزم npm
+3. توليد Prisma Client
+4. تطبيق مخطط قاعدة البيانات
+5. تثبيت متصفح Playwright (Chromium)
+6. تشغيل: npm run check:all
+   → ESLint ✓
+   → Vitest (unit + integration) ✓
+   → Playwright E2E ✓
+</pre>
+
+  <div class="sub-title">نمط اختبار E2E — تسجيل الدخول مع محاكاة الشبكة</div>
+<pre>
+<span class="comment">// tests/e2e/login.spec.js</span>
+test(<span class="string">"successful login redirects admin to dashboard"</span>, async ({ page }) => {
+  <span class="comment">// محاكاة استجابة API بدون خادم حقيقي</span>
+  await page.route(<span class="string">"**/auth/login"</span>, route => route.fulfill({
+    json: { accessToken: <span class="string">"tok"</span>, user: { role: <span class="string">"ADMIN"</span> } }
+  }));
+
+  await page.fill(<span class="string">"#email"</span>, <span class="string">"admin@talenthub.local"</span>);
+  await page.fill(<span class="string">"#password"</span>, <span class="string">"Admin1234"</span>);
+  await page.click(<span class="string">'button[type="submit"]'</span>);
+
+  <span class="comment">// التحقق من التوجيه الصحيح</span>
+  await expect(page).toHaveURL(/dashbord\/admin\/dashbord\.html/);
+});
+</pre>
+</div>
+
+<!-- ==================== 10. التشغيل ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">١٠. كيفية تشغيل المشروع</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <h2 class="section-title">الطريقة الأولى: تشغيل سريع بضغطة واحدة (Windows)</h2>
+  <div class="success-box">
+    <strong>الأسهل والأسرع:</strong> انقر نقراً مزدوجاً على ملف <code>run-project.bat</code> في جذر المشروع.<br>
+    سيقوم تلقائياً بتشغيل الخادم الخلفي + خادم الواجهة + فتح المتصفح على صفحة تسجيل الدخول.
+  </div>
+
+  <h2 class="section-title">الطريقة الثانية: التشغيل اليدوي خطوة بخطوة</h2>
+
+  <div class="sub-title">الخطوة ١ — تثبيت الحزم (مرة واحدة)</div>
+<pre>
+npm --prefix backend install
+</pre>
+
+  <div class="sub-title">الخطوة ٢ — إعداد قاعدة البيانات (مرة واحدة)</div>
+<pre>
+<span class="comment"># نسخ ملف البيئة</span>
+copy backend\.env.example backend\.env
+
+<span class="comment"># توليد Prisma Client</span>
+npm --prefix backend run prisma:generate
+
+<span class="comment"># تطبيق مخطط قاعدة البيانات</span>
+npm --prefix backend run prisma:push
+
+<span class="comment"># زرع بيانات المسؤول الابتدائية</span>
+npm run seed:api
+</pre>
+
+  <div class="sub-title">الخطوة ٣ — تشغيل الخادم الخلفي</div>
+<pre>
+<span class="comment"># في نافذة أوامر أولى</span>
+npm run dev:api
+<span class="comment"># الخادم يبدأ على: http://localhost:4000</span>
+</pre>
+
+  <div class="sub-title">الخطوة ٤ — تشغيل الواجهة الأمامية</div>
+<pre>
+<span class="comment"># في نافذة أوامر ثانية</span>
+npx http-server -p 5500 -c-1
+<span class="comment"># الواجهة تبدأ على: http://127.0.0.1:5500</span>
+</pre>
+
+  <div class="sub-title">الخطوة ٥ — فتح المتصفح</div>
+<pre>
+http://127.0.0.1:5500/login/login.html
+</pre>
+
+  <hr class="section-divider">
+
+  <h2 class="section-title">بيانات الحسابات التجريبية</h2>
+  <table>
+    <thead><tr><th>الدور</th><th>البريد الإلكتروني</th><th>كلمة المرور</th><th>الواجهة التي تفتح</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-red">مسؤول</span></td><td><code>admin@talenthub.local</code></td><td><code>Admin1234</code></td><td>لوحة المسؤول الكاملة</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">لإضافة طلاب وشركات وجامعات تجريبية: <code>npm --prefix backend run seed</code></div>
+
+  <hr class="section-divider">
+
+  <h2 class="section-title">المتطلبات التقنية</h2>
+  <table>
+    <thead><tr><th>المتطلب</th><th>الإصدار الأدنى</th><th>كيف تتحقق</th></tr></thead>
+    <tbody>
+      <tr><td>Node.js</td><td>20.0.0</td><td><code>node --version</code></td></tr>
+      <tr><td>npm</td><td>10.0.0</td><td><code>npm --version</code></td></tr>
+      <tr><td>متصفح حديث</td><td>Chrome / Edge / Firefox</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== 11. النشر ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">١١. النشر على السحابة</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <h2 class="section-title">النشر عبر Render.com</h2>
+  <p>يحتوي المشروع على ملف <code>render.yaml</code> الجاهز للنشر التلقائي على منصة Render.com (مجانية للمشاريع الصغيرة).</p>
+
+  <div class="sub-title">خطوات النشر</div>
+  <ol>
+    <li>أنشئ حساباً مجانياً على <code>render.com</code></li>
+    <li>اربط الحساب بمستودع GitHub</li>
+    <li>اختر "New Web Service" وحدد المستودع</li>
+    <li>Render سيقرأ <code>render.yaml</code> تلقائياً ويُهيّئ الخدمة</li>
+    <li>أضف متغيرات البيئة في إعدادات الخدمة (JWT_SECRET، DATABASE_URL، إلخ)</li>
+  </ol>
+
+  <div class="sub-title">ملف <code>render.yaml</code></div>
+<pre>
+services:
+  - type: web
+    name: talenthub-api
+    env: node
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
+    startCommand: node src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false   <span class="comment"># تُدخَل يدوياً في لوحة Render</span>
+      - key: JWT_SECRET
+        sync: false
+</pre>
+
+  <div class="sub-title">إعدادات الإنتاج المطلوبة</div>
+  <table>
+    <thead><tr><th>المتغير</th><th>القيمة المطلوبة في الإنتاج</th></tr></thead>
+    <tbody>
+      <tr><td><code>DATABASE_URL</code></td><td>رابط PostgreSQL من Render أو Supabase</td></tr>
+      <tr><td><code>JWT_SECRET</code></td><td>نص عشوائي طويل (32+ حرف)</td></tr>
+      <tr><td><code>JWT_REFRESH_SECRET</code></td><td>نص عشوائي مختلف (32+ حرف)</td></tr>
+      <tr><td><code>CORS_ORIGIN</code></td><td>رابط الواجهة الأمامية المنشورة</td></tr>
+      <tr><td><code>NODE_ENV</code></td><td><code>production</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== 12. الخلاصة ==================== -->
+<div class="page">
+  <div class="page-header">
+    <div class="title">١٢. الخلاصة ونقاط القوة</div>
+    <div class="num">TalentHub — تقرير مشروع التخرج</div>
+  </div>
+
+  <h2 class="section-title">ملخص المشروع</h2>
+  <p>
+    منصة <strong>تالنت هب</strong> هي مشروع تخرج متكامل يُجسّد الجانب العملي لتطوير تطبيقات الويب الحديثة. يجمع المشروع بين الواجهة الأمامية العربية الكاملة والخادم الخلفي المبني بأفضل الممارسات، مع اهتمام واضح بالجودة والأمان والاختبار الآلي.
+  </p>
+
+  <h2 class="section-title">نقاط القوة الرئيسية</h2>
+  <table>
+    <thead><tr><th>#</th><th>نقطة القوة</th><th>الدليل</th></tr></thead>
+    <tbody>
+      <tr><td>١</td><td>معمارية نظيفة ومنظّمة</td><td>فصل واضح: routes → controllers → validators → prisma</td></tr>
+      <tr><td>٢</td><td>أمان متعدد الطبقات</td><td>Helmet + CORS + JWT + bcrypt + Zod = حماية شاملة</td></tr>
+      <tr><td>٣</td><td>نظام مصادقة احترافي</td><td>Access Token (15د) + Refresh Token (7 أيام) + تخزين آمن</td></tr>
+      <tr><td>٤</td><td>اختبارات آلية شاملة</td><td>٦ اختبارات: وحدة + تكامل + E2E كلها تنجح</td></tr>
+      <tr><td>٥</td><td>صفر ثغرات أمنية</td><td>npm audit → 0 vulnerabilities بعد تحديث Vite</td></tr>
+      <tr><td>٦</td><td>CI/CD تلقائي</td><td>GitHub Actions يُشغّل كل الاختبارات عند كل push</td></tr>
+      <tr><td>٧</td><td>دعم لغوي كامل</td><td>عربي RTL + إنجليزي + وضع داكن + متجاوب</td></tr>
+      <tr><td>٨</td><td>جاهز للنشر السحابي</td><td>render.yaml + .env.production.example جاهزان</td></tr>
+      <tr><td>٩</td><td>توثيق شامل</td><td>README + SETUP_INSTRUCTIONS + وصايا.md + هذا التقرير</td></tr>
+      <tr><td>١٠</td><td>سهولة التشغيل</td><td>run-project.bat — ضغطة واحدة تشغّل كل شيء</td></tr>
+    </tbody>
+  </table>
+
+  <div class="success-box" style="margin-top:24px">
+    <strong>النتيجة النهائية:</strong><br>
+    <code>npm run check:all</code> → ESLint ✅ | Vitest (4 اختبارات) ✅ | Playwright E2E (2 اختبارات) ✅<br>
+    <code>npm audit</code> → <strong>0 vulnerabilities</strong> ✅<br>
+    <code>GET /api/health</code> → <code>{"status":"ok"}</code> ✅
+  </div>
+
+  <hr class="section-divider">
+
+  <div style="text-align:center;padding:30px;background:var(--light);border-radius:12px;margin-top:20px">
+    <div style="font-size:36px;margin-bottom:12px">💼</div>
+    <div style="font-size:22px;font-weight:900;color:var(--primary)">TalentHub</div>
+    <div style="font-size:14px;color:var(--gray);margin-top:6px">منصة متكاملة لإدارة التوظيف والمهارات</div>
+    <div style="font-size:12px;color:#aaa;margin-top:16px">مشروع التخرج — تقرير شامل</div>
+  </div>
+</div>
+
+<script>
+  window.onload = function() { window.print(); };
+</script>
+</body>
+</html>

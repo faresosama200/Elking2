@@ -4,10 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>طلباتي | TalentHub</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-<script src="../../dashbord/api.js"></script>
+<link rel="stylesheet" href="../../dashbord/admin-shared.css">
+
+<style>
+body { background: #f5f6fa; }
+
+.card-clean {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+</style>
 </head>
-<body class="bg-light">
+
+<body>
+
 <script>
 (function () {
   var token = localStorage.getItem("th_token");
@@ -18,187 +31,171 @@
 }());
 </script>
 
-<!-- نافبار -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand fw-bold" href="dashboard.html">TalentHub</a>
-    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
-        <li class="nav-item"><a class="nav-link" href="jobs.html">الوظائف</a></li>
-        <li class="nav-item"><a class="nav-link active" href="my-applications.html">طلباتي</a></li>
-        <li class="nav-item"><a class="nav-link" href="my-profile.html">ملفي</a></li>
-        <li class="nav-item"><a class="nav-link" onclick="logout()" style="cursor:pointer">تسجيل الخروج</a></li>
-      </ul>
-    </div>
-  </div>
+<!-- Navbar  -->
+<nav class="navbar navbar-expand-lg custom-navbar">
+<div class="container">
+<a class="navbar-brand logo" href="dashboard.html">TalentHub</a>
+
+<button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#menu">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="menu">
+<ul class="navbar-nav ms-auto">
+
+<li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
+<li class="nav-item"><a class="nav-link" href="jobs.html">الوظائف</a></li>
+<li class="nav-item"><a class="nav-link active" href="my-applications.html">طلباتي</a></li>
+<li class="nav-item"><a class="nav-link" href="my-profile.html">ملفي</a></li>
+
+<li class="nav-item ms-3">
+<button class="btn btn-danger btn-sm" onclick="logout()">تسجيل الخروج</button>
+</li>
+
+</ul>
+</div>
+</div>
 </nav>
 
-<div class="container py-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3>طلباتي</h3>
-    <div class="d-flex gap-2 align-items-center">
-      <select id="statusFilter" class="form-select" style="max-width:160px">
-        <option value="">كل الحالات</option>
-        <option value="PENDING">قيد الانتظار</option>
-        <option value="REVIEWED">قيد المراجعة</option>
-        <option value="ACCEPTED">مقبول</option>
-        <option value="REJECTED">مرفوض</option>
-      </select>
-      <select id="pageSize" class="form-select" style="max-width:140px">
-        <option value="10" selected>10 لكل صفحة</option>
-        <option value="20">20 لكل صفحة</option>
-        <option value="50">50 لكل صفحة</option>
-      </select>
-    </div>
-  </div>
+<div class="container mt-5">
 
-  <div class="table-responsive bg-white shadow-sm rounded p-3">
-    <table class="table table-hover align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>الوظيفة</th>
-          <th>الشركة</th>
-          <th>الحالة</th>
-          <th>تاريخ التقديم</th>
-          <th>رسالة التغطية</th>
-          <th>إجراء</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"><tr><td colspan="6" class="text-center text-muted py-4">جاري التحميل...</td></tr></tbody>
-    </table>
-    <div class="d-flex justify-content-between align-items-center mt-3" id="pager"></div>
-  </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h4>طلباتي</h4>
+
+<div class="d-flex gap-2">
+<select id="statusFilter" class="form-select">
+<option value="">كل الحالات</option>
+<option value="PENDING">قيد الانتظار</option>
+<option value="REVIEWED">قيد المراجعة</option>
+<option value="ACCEPTED">مقبول</option>
+<option value="REJECTED">مرفوض</option>
+</select>
+
+<select id="pageSize" class="form-select">
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="50">50</option>
+</select>
 </div>
 
-<!-- مودال رسالة التغطية -->
-<div class="modal fade" id="coverLetterModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">رسالة التغطية</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p class="text-muted mb-2">الوظيفة: <strong id="clJobTitle">-</strong></p>
-        <hr>
-        <p id="clText" class="text-body" style="white-space:pre-wrap"></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-      </div>
-    </div>
-  </div>
 </div>
 
+<div class="card-clean">
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+
+<thead>
+<tr>
+<th>الوظيفة</th>
+<th>الشركة</th>
+<th>الحالة</th>
+<th>التاريخ</th>
+<th>الرسالة</th>
+<th>الإجراء</th>
+</tr>
+</thead>
+
+<tbody id="tbody">
+<tr><td colspan="6" class="text-center text-muted py-4">جاري التحميل...</td></tr>
+</tbody>
+
+</table>
+</div>
+
+<div id="pager" class="d-flex justify-content-between mt-3"></div>
+
+</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="coverLetterModal">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<div class="modal-header">
+<h5>رسالة التقديم</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+<p>الوظيفة: <strong id="clJobTitle"></strong></p>
+<hr>
+<p id="clText"></p>
+</div>
+
+</div>
+</div>
+</div>
+
+<script src="../../dashbord/api.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 if (!requireRole("STUDENT")) throw new Error("redirect");
 
 let currentPage = 1;
 let pageLimit = 10;
-let coverLetterModal;
+let modal;
 
-document.addEventListener("DOMContentLoaded", function () {
-  coverLetterModal = new bootstrap.Modal(document.getElementById("coverLetterModal"));
+document.addEventListener("DOMContentLoaded", () => {
+  modal = new bootstrap.Modal(document.getElementById("coverLetterModal"));
 });
 
-function statusBadgeClass(status) {
-  if (status === "ACCEPTED") return "bg-success";
-  if (status === "REJECTED") return "bg-danger";
-  if (status === "REVIEWED") return "bg-info text-dark";
+function statusBadge(s){
+  if(s==="ACCEPTED") return "bg-success";
+  if(s==="REJECTED") return "bg-danger";
+  if(s==="REVIEWED") return "bg-info text-dark";
   return "bg-warning text-dark";
 }
 
-function viewCoverLetter(jobTitle, text) {
-  document.getElementById("clJobTitle").textContent = jobTitle || "-";
-  document.getElementById("clText").textContent = text || "(لم تكتب رسالة تغطية)";
-  coverLetterModal.show();
+function viewCoverLetter(title,text){
+  clJobTitle.textContent=title;
+  clText.textContent=text || "لا يوجد";
+  modal.show();
 }
 
-async function removeApplication(id) {
-  if (!confirm("هل تريد حذف هذا الطلب؟")) return;
-  try {
-    await apiFetch("/applications/" + id, { method: "DELETE" });
-    showToast("تم حذف الطلب", "success");
-    await loadApplications();
-  } catch (e) {
-    showToast(e.message || "فشل حذف الطلب", "error");
-  }
-}
-
-function renderPager(pagination) {
-  const pager = document.getElementById("pager");
-  if (!pagination || pagination.totalPages <= 1) { pager.innerHTML = ""; return; }
-  pager.innerHTML =
-    "<span class='text-muted small'>صفحة " + pagination.page + " من " + pagination.totalPages + " — إجمالي " + pagination.total + " طلب</span>" +
-    "<div class='d-flex gap-2'>" +
-    "<button class='btn btn-sm btn-outline-secondary' " + (pagination.page <= 1 ? "disabled" : "") + " onclick='goPage(" + (pagination.page - 1) + ")'>السابق</button>" +
-    "<button class='btn btn-sm btn-outline-secondary' " + (pagination.page >= pagination.totalPages ? "disabled" : "") + " onclick='goPage(" + (pagination.page + 1) + ")'>التالي</button>" +
-    "</div>";
-}
-
-function goPage(page) {
-  if (page < 1) return;
-  currentPage = page;
+async function removeApplication(id){
+  if(!confirm("حذف الطلب؟")) return;
+  await apiFetch("/applications/"+id,{method:"DELETE"});
   loadApplications();
 }
 
-async function loadApplications() {
-  try {
-    const statusVal = document.getElementById("statusFilter").value;
-    let url = "/applications?page=" + currentPage + "&limit=" + pageLimit;
-    if (statusVal) url += "&status=" + statusVal;
+async function loadApplications(){
+  try{
+    let url="/applications?page="+currentPage+"&limit="+pageLimit;
+    if(statusFilter.value) url+="&status="+statusFilter.value;
 
-    const data = await apiFetch(url);
-    const rows = (data.items || []).map(function (a) {
-      const canDelete = a.status === "PENDING";
-      const deleteBtn = canDelete
-        ? "<button class='btn btn-sm btn-outline-danger' onclick='removeApplication(\"" + a.id + "\")'>حذف</button>"
-        : "<span class='text-muted small badge bg-light text-secondary border'>" + arStatus(a.status) + " - لا يمكن الحذف</span>";
+    const data=await apiFetch(url);
 
-      const hasCover = a.coverLetter && a.coverLetter.trim();
-      const safeTitle = (a.job && a.job.title ? a.job.title : "").replace(/\\/g, "\\\\").replace(/"/g, "&quot;");
-      const safeCover = (a.coverLetter || "").replace(/"/g, "&quot;");
-      const coverBtn = hasCover
-        ? "<button class='btn btn-sm btn-outline-info' onclick='viewCoverLetter(\"" + safeTitle + "\", this.dataset.text)' data-text=\"" + safeCover + "\">عرض</button>"
-        : "<span class='text-muted small'>—</span>";
+    tbody.innerHTML=(data.items||[]).map(a=>{
+      return `
+      <tr>
+      <td><strong>${a.job?.title||"-"}</strong></td>
+      <td>${a.job?.companyName||"-"}</td>
+      <td><span class="badge ${statusBadge(a.status)}">${arStatus(a.status)}</span></td>
+      <td>${a.createdAt||"-"}</td>
+      <td>
+        ${a.coverLetter ? `<button class="btn btn-sm btn-outline-info" onclick="viewCoverLetter('${a.job?.title}','${a.coverLetter}')">عرض</button>` : "-"}
+      </td>
+      <td>
+        ${a.status==="PENDING" ? `<button class="btn btn-sm btn-outline-danger" onclick="removeApplication('${a.id}')">حذف</button>` : "-"}
+      </td>
+      </tr>
+      `;
+    }).join("") || `<tr><td colspan="6" class="text-center">لا يوجد</td></tr>`;
 
-      return "<tr>" +
-        "<td><strong>" + (a.job && a.job.title ? a.job.title : "-") + "</strong></td>" +
-        "<td>" + (a.job && a.job.companyName ? a.job.companyName : "-") + "</td>" +
-        "<td><span class='badge " + statusBadgeClass(a.status) + "'>" + arStatus(a.status) + "</span></td>" +
-        "<td>" + (a.createdAt || "-") + "</td>" +
-        "<td>" + coverBtn + "</td>" +
-        "<td>" + deleteBtn + "</td>" +
-        "</tr>";
-    });
-
-    document.getElementById("tbody").innerHTML = rows.length
-      ? rows.join("")
-      : "<tr><td colspan='6' class='text-center text-muted py-4'>لا توجد طلبات حالياً</td></tr>";
-    renderPager(data.pagination);
-  } catch (e) {
-    document.getElementById("tbody").innerHTML = "<tr><td colspan='6' class='text-center text-danger py-4'>" + (e.message || "فشل التحميل") + "</td></tr>";
-    renderPager(null);
+  }catch{
+    tbody.innerHTML=`<tr><td colspan="6" class="text-center text-danger">خطأ</td></tr>`;
   }
 }
+
+pageSize.onchange=()=>{pageLimit=pageSize.value;loadApplications();}
+statusFilter.onchange=()=>{loadApplications();}
 
 loadApplications();
-
-document.getElementById("pageSize").addEventListener("change", function () {
-  pageLimit = Number(this.value) || 10;
-  currentPage = 1;
-  loadApplications();
-});
-
-document.getElementById("statusFilter").addEventListener("change", function () {
-  currentPage = 1;
-  loadApplications();
-});
 </script>
+
 </body>
 </html>

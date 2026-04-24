@@ -3,120 +3,202 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>طلاب الجامعة | TalentHub</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-<link rel="stylesheet" href="../../ui-styles.css">
-<style>
-body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-.custom-navbar { background: rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.card-wrap { background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(16,24,40,0.08); }
-.kpi-card { background: #fff; border-radius: 14px; border: 1px solid #e5edf5; padding: 16px; }
-.kpi-title { font-size: 13px; color: #5e7287; margin-bottom: 6px; }
-.kpi-value { font-size: 28px; font-weight: 700; color: #102a43; }
-.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
-</style>
-</head>
-<body>
-<div id="toast-container"></div>
-<script src="../../dashbord/api.js"></script>
-<script>(function(){ if(!requireAuth()) return; if(!requireRole('UNIVERSITY')) return; }());</script>
 
+<title>طلاب الجامعة | TalentHub</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../../dashbord/admin-shared.css">
+
+<style>
+body { background: #f5f6fa; }
+
+.card-clean {
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.table-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.stat-number {
+  font-size: 26px;
+  font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<script>
+(function(){
+  if(!requireAuth()) return;
+  if(!requireRole('UNIVERSITY')) return;
+}());
+</script>
+
+<!--  Navbar -->
 <nav class="navbar navbar-expand-lg custom-navbar">
 <div class="container">
-<a class="navbar-brand" href="dashboard.html"><strong>TalentHub</strong> جامعة</a>
-<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarMenu"><span class="navbar-toggler-icon"></span></button>
-<div class="collapse navbar-collapse" id="navbarMenu">
+
+<a class="navbar-brand logo" href="dashboard.html">TalentHub</a>
+
+<button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#menu">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="menu">
 <ul class="navbar-nav ms-auto">
+
 <li class="nav-item"><a class="nav-link" href="dashboard.html">الرئيسية</a></li>
 <li class="nav-item"><a class="nav-link active" href="students.html">الطلاب</a></li>
 <li class="nav-item"><a class="nav-link" href="departments.html">الأقسام</a></li>
 <li class="nav-item"><a class="nav-link" href="partnerships.html">الشراكات</a></li>
-<li class="nav-item"><a class="nav-link" href="university-profile.html">ملف الجامعة</a></li>
-<li class="nav-item"><a class="nav-link" onclick="logout()">تسجيل الخروج</a></li>
+<li class="nav-item"><a class="nav-link" href="university-profile.html">ملفي</a></li>
+
+<li class="nav-item ms-3">
+<button class="btn btn-danger btn-sm" onclick="logout()">تسجيل الخروج</button>
+</li>
+
 </ul>
 </div>
 </div>
 </nav>
 
-<main class="container pt-5 pb-5">
+<div class="container mt-5">
+
 <div class="d-flex justify-content-between align-items-center mb-4">
-<div>
-  <h3 class="mb-1">طلاب الجامعة</h3>
-  <p class="text-white-50 mb-0">قائمة الطلاب المنتسبين للجامعة على المنصة</p>
-</div>
-<button class="btn btn-light" onclick="loadStudents()">تحديث</button>
+<h4>طلاب الجامعة</h4>
+<button class="btn btn-primary btn-sm" onclick="loadStudents()">تحديث</button>
 </div>
 
+<!-- 📊 Stats -->
 <div class="row g-3 mb-4">
-<div class="col-md-4"><div class="kpi-card"><div class="kpi-title">إجمالي الطلاب</div><div id="kpiTotal" class="kpi-value">0</div></div></div>
-<div class="col-md-4"><div class="kpi-card"><div class="kpi-title">طلاب نشطون</div><div id="kpiActive" class="kpi-value">0</div></div></div>
-<div class="col-md-4"><div class="kpi-card"><div class="kpi-title">قيد المراجعة</div><div id="kpiPending" class="kpi-value">0</div></div></div>
+
+<div class="col-md-4">
+<div class="card-clean">
+<div>إجمالي الطلاب</div>
+<div class="stat-number" id="kpiTotal">0</div>
+</div>
 </div>
 
-<div class="card-wrap p-3">
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h5 class="mb-0">قائمة الطلاب</h5>
-  <input id="searchInput" class="form-control" style="max-width:260px" placeholder="ابحث بالاسم أو البريد..." oninput="renderTable()">
+<div class="col-md-4">
+<div class="card-clean">
+<div>نشط</div>
+<div class="stat-number" id="kpiActive">0</div>
 </div>
+</div>
+
+<div class="col-md-4">
+<div class="card-clean">
+<div>قيد المراجعة</div>
+<div class="stat-number" id="kpiPending">0</div>
+</div>
+</div>
+
+</div>
+
+<!-- 📋 Table -->
+<div class="table-card">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h5 class="mb-0">قائمة الطلاب</h5>
+<input id="searchInput" class="form-control" style="max-width:250px" placeholder="بحث..." oninput="renderTable()">
+</div>
+
 <div class="table-responsive">
 <table class="table table-hover align-middle">
-<thead><tr><th>#</th><th>الاسم</th><th>البريد الإلكتروني</th><th>الحالة</th><th>تاريخ الانضمام</th></tr></thead>
-<tbody id="studentsBody"><tr><td colspan="5" class="text-center text-muted py-4">جاري التحميل...</td></tr></tbody>
+
+<thead>
+<tr>
+<th>#</th>
+<th>الاسم</th>
+<th>الإيميل</th>
+<th>الحالة</th>
+<th>تاريخ الانضمام</th>
+</tr>
+</thead>
+
+<tbody id="studentsBody">
+<tr><td colspan="5" class="text-center text-muted">جاري التحميل...</td></tr>
+</tbody>
+
 </table>
 </div>
-</div>
-</main>
 
+</div>
+
+</div>
+
+<script src="../../dashbord/api.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 let allStudents = [];
 
-function statusBadge(s) {
-  if (s === 'ACTIVE') return 'bg-success';
-  if (s === 'PENDING') return 'bg-warning text-dark';
+function statusBadge(s){
+  if(s === 'ACTIVE') return 'bg-success';
+  if(s === 'PENDING') return 'bg-warning text-dark';
   return 'bg-secondary';
 }
 
-function renderTable() {
-  const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-  const rows = allStudents.filter(s => !q || ((s.user?.fullName || '') + ' ' + (s.user?.email || '')).toLowerCase().includes(q));
-  const body = document.getElementById('studentsBody');
-  if (!rows.length) {
-    body.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">لا توجد نتائج.</td></tr>';
+function renderTable(){
+  const q = (searchInput.value || '').toLowerCase();
+
+  const rows = allStudents.filter(s =>
+    !q ||
+    (s.user?.fullName || '').toLowerCase().includes(q) ||
+    (s.user?.email || '').toLowerCase().includes(q)
+  );
+
+  if(!rows.length){
+    studentsBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">لا يوجد</td></tr>';
     return;
   }
-  body.innerHTML = rows.map((s, i) => `<tr>
-    <td>${i + 1}</td>
-    <td>${s.user?.fullName || '-'}</td>
-    <td>${s.user?.email || '-'}</td>
-    <td><span class="badge ${statusBadge(s.status)}">${arStatus(s.status)}</span></td>
-    <td>${s.createdAt ? new Date(s.createdAt).toLocaleDateString('ar-EG') : '-'}</td>
-  </tr>`).join('');
+
+  studentsBody.innerHTML = rows.map((s,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${s.user?.fullName || '-'}</td>
+      <td>${s.user?.email || '-'}</td>
+      <td><span class="badge ${statusBadge(s.status)}">${arStatus(s.status)}</span></td>
+      <td>${s.createdAt ? new Date(s.createdAt).toLocaleDateString('ar-EG') : '-'}</td>
+    </tr>
+  `).join('');
 }
 
-async function loadStudents() {
-  document.getElementById('studentsBody').innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">جاري التحميل...</td></tr>';
-  try {
-    let page = 1; const limit = 50; let totalPages = 1; allStudents = [];
-    while (page <= totalPages) {
-      const data = await apiFetch('/students?page=' + page + '&limit=' + limit);
+async function loadStudents(){
+  studentsBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">جاري التحميل...</td></tr>';
+
+  try{
+    let page = 1, totalPages = 1;
+    allStudents = [];
+
+    while(page <= totalPages){
+      const data = await apiFetch('/students?page='+page+'&limit=50');
       allStudents.push(...(data.items || []));
       totalPages = data.pagination?.totalPages || 1;
       page++;
     }
-    const active = allStudents.filter(s => s.status === 'ACTIVE').length;
-    const pending = allStudents.filter(s => s.status === 'PENDING').length;
-    document.getElementById('kpiTotal').textContent = allStudents.length;
-    document.getElementById('kpiActive').textContent = active;
-    document.getElementById('kpiPending').textContent = pending;
+
+    kpiTotal.textContent = allStudents.length;
+    kpiActive.textContent = allStudents.filter(s=>s.status==='ACTIVE').length;
+    kpiPending.textContent = allStudents.filter(s=>s.status==='PENDING').length;
+
     renderTable();
-  } catch (e) {
-    showToast(e.message || 'فشل تحميل الطلاب', 'error');
-    document.getElementById('studentsBody').innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">فشل التحميل</td></tr>';
+
+  }catch(e){
+    showToast("فشل تحميل الطلاب","error");
   }
 }
 
 loadStudents();
 </script>
+
 </body>
 </html>

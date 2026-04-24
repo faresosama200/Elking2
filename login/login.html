@@ -118,11 +118,20 @@ function normalizeApiBase(value) {
   return String(value || "").trim().replace(/\/+$/, "");
 }
 
+function isLocalStaticDev() {
+  return window.location.hostname === "127.0.0.1"
+    && window.location.port === "5500";
+}
+
 function getExplicitApiBase() {
   const byQuery = new URLSearchParams(window.location.search).get("api");
   const byWindow = window.TALENTHUB_API_BASE;
   const byStorage = localStorage.getItem(API_OVERRIDE_KEY);
   const explicit = normalizeApiBase(byQuery || byWindow || byStorage);
+
+  if (!byQuery && isLocalStaticDev() && /\/php-api\/index\.php$/i.test(explicit)) {
+    return "";
+  }
 
   if (byQuery && explicit) {
     localStorage.setItem(API_OVERRIDE_KEY, explicit);
@@ -136,9 +145,15 @@ function buildApiCandidates() {
   const protocol = host === "127.0.0.1" ? "http:" : (window.location.protocol === "file:" ? "http:" : window.location.protocol);
   const candidates = [];
   const explicitApi = getExplicitApiBase();
+  const preferNodeApi = isLocalStaticDev() && !explicitApi;
 
   if (explicitApi) {
     candidates.push(explicitApi);
+  }
+
+  if (preferNodeApi) {
+    candidates.push("http://127.0.0.1:4000/api");
+    candidates.push("http://localhost:4000/api");
   }
 
   if (window.location.protocol !== "file:") {
