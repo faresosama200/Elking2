@@ -1,0 +1,8 @@
+run = "npm run dev"
+entrypoint = "src/server.js"
+
+[env]
+NODE_ENV = "production"
+
+[nix]
+channel = "stable-22_11"
