@@ -20,7 +20,7 @@ services:
       - key: JWT_REFRESH_SECRET
         generateValue: true
       - key: ACCESS_TOKEN_EXPIRES_IN
-        value: 15m
+        value: 2h
       - key: REFRESH_TOKEN_EXPIRES_IN
         value: 7d
       - key: LOG_LEVEL

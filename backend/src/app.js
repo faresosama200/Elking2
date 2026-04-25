@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const pinoHttp = require("pino-http");
 const env = require("./config/env");
 const logger = require("./config/logger");
+const prisma = require("./config/prisma");
 const authRoutes = require("./routes/auth.routes");
 const authController = require("./controllers/auth.controller");
 const { requireAuth } = require("./middlewares/auth");
@@ -80,16 +81,44 @@ app.get("/api/health", (req, res) => {
 // Dashboard stats endpoint (all authenticated roles)
 app.get("/api/dashboard", requireAuth, async (req, res, next) => {
   try {
-    const prisma = require("./config/prisma");
-    const [students, companies, universities, jobs, applications] = await Promise.all([
+    const [students, companies, universities, jobs, applications, studentsByUniversity, jobsByType] = await Promise.all([
       prisma.student.count(),
       prisma.company.count(),
       prisma.university.count(),
       prisma.job.count(),
-      prisma.application.count()
+      prisma.application.count(),
+      prisma.university.findMany({
+        take: 6,
+        orderBy: { students: { _count: "desc" } },
+        select: {
+          name: true,
+          _count: {
+            select: {
+              students: true
+            }
+          }
+        }
+      }),
+      prisma.job.groupBy({
+        by: ["type"],
+        _count: {
+          _all: true
+        }
+      })
     ]);
+
     res.json({
-      stats: { students, companies, universities, jobs, applications }
+      stats: { students, companies, universities, jobs, applications },
+      charts: {
+        studentsByUniversity: studentsByUniversity.map((u) => ({
+          name: u.name,
+          count: u._count.students
+        })),
+        jobsByType: jobsByType.map((j) => ({
+          type: j.type,
+          count: j._count._all
+        }))
+      }
     });
   } catch (err) {
     next(err);

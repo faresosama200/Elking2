@@ -293,11 +293,10 @@ function renderRecentJobs(items) {
 
 async function loadDashboard() {
   try {
-    const [stats, students, jobs, universities] = await Promise.all([
+    const [stats, students, jobs] = await Promise.all([
       apiFetch('/dashboard'),
       apiFetch('/students?page=1&limit=5'),
-      apiFetch('/jobs?page=1&limit=5'),
-      apiFetch('/universities?page=1&limit=4')
+      apiFetch('/jobs?page=1&limit=5')
     ]);
 
     document.getElementById('statStudents').textContent = stats.stats?.students ?? 0;
@@ -308,17 +307,18 @@ async function loadDashboard() {
     renderRecentStudents(students.items || []);
     renderRecentJobs(jobs.items || []);
 
-    const uniLabels = (universities.items || []).map((u) => u.name || 'جامعة');
-    const uniData = (universities.items || []).map((u) => u.studentsCount || 0);
+    const uniChartData = stats.charts?.studentsByUniversity || [];
+    const uniLabels = uniChartData.map((u) => u.name || 'جامعة');
+    const uniData = uniChartData.map((u) => Number(u.count || 0));
     studentsChart.data.labels = uniLabels.length ? uniLabels : ['الجامعة 1'];
     studentsChart.data.datasets[0].data = uniData.length ? uniData : [0];
     studentsChart.update();
 
-    const typeMap = { FULL_TIME: 0, PART_TIME: 0, INTERNSHIP: 0 };
-    (jobs.items || []).forEach((job) => {
-      if (typeMap[job.type] !== undefined) typeMap[job.type] += 1;
-    });
-    jobsChart.data.datasets[0].data = [typeMap.FULL_TIME, typeMap.PART_TIME, typeMap.INTERNSHIP];
+    const typeChartData = stats.charts?.jobsByType || [];
+    const typeLabels = typeChartData.map((j) => arJobType(j.type));
+    const typeCounts = typeChartData.map((j) => Number(j.count || 0));
+    jobsChart.data.labels = typeLabels.length ? typeLabels : ['دوام كامل', 'دوام جزئي', 'تدريب'];
+    jobsChart.data.datasets[0].data = typeCounts.length ? typeCounts : [0, 0, 0];
     jobsChart.update();
   } catch (err) {
     showToast(err.message || 'تعذر تحميل بيانات الداشبورد', 'error');

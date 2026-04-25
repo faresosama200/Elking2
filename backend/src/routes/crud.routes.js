@@ -78,18 +78,6 @@ const universitiesRouter = buildCrudRouter(
   ["ADMIN"]
 );
 
-// Jobs: STUDENT can read (GET), ADMIN/COMPANY can write
-const jobsRouterBase = buildCrudRouter(
-  {
-    model: "job",
-    searchFields: ["title", "location", "description"],
-    include: { company: true, skills: { include: { skill: true } } }
-  },
-  jobCreateSchema,
-  jobUpdateSchema,
-  ["ADMIN", "COMPANY"]
-);
-
 const jobsRouter = express.Router();
 const jobHandlers = createCrudHandlers({
   model: "job",
