@@ -23,6 +23,13 @@ function isLocalStaticDev() {
     && window.location.port === "5500";
 }
 
+function isGitHubPages() {
+  return window.location.hostname === "faresosama200.github.io";
+}
+
+// Production backend URL on Render.com (update after first deploy)
+const RENDER_API_URL = "https://talenthub-api.onrender.com/api";
+
 function getExplicitApiBase() {
   const byQuery = new URLSearchParams(window.location.search).get("api");
   const byWindow = window.TALENTHUB_API_BASE;
@@ -49,6 +56,12 @@ function buildApiCandidates() {
 
   if (explicitApi) {
     candidates.push(explicitApi);
+  }
+
+  // On GitHub Pages, always use Render.com backend first
+  if (isGitHubPages()) {
+    candidates.push(RENDER_API_URL);
+    return unique(candidates);
   }
 
   if (preferNodeApi) {
@@ -227,9 +240,31 @@ function arJobType(value) {
 }
 
 /* ---------- Authenticated fetch ---------- */
+let _refreshing = null;
+
+async function _doRefresh() {
+  const refresh = localStorage.getItem("th_refresh");
+  if (!refresh) throw new Error("no_refresh");
+  const apiBase = await resolveApiBase();
+  const res = await fetch(apiBase + "/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken: refresh })
+  });
+  if (!res.ok) {
+    clearAuth();
+    window.location.href = dashboardDepth + "/login/login.html";
+    throw new Error("refresh_failed");
+  }
+  const data = await res.json();
+  localStorage.setItem("th_token", data.accessToken);
+  if (data.refreshToken) localStorage.setItem("th_refresh", data.refreshToken);
+  return data.accessToken;
+}
+
 async function apiFetch(path, options = {}) {
   const apiBase = await resolveApiBase();
-  const token = getToken();
+  let token = getToken();
   const response = await fetch(apiBase + path, {
     headers: {
       "Content-Type": "application/json",
@@ -237,6 +272,30 @@ async function apiFetch(path, options = {}) {
     },
     ...options
   });
+
+  if (response.status === 401) {
+    // Try refresh once
+    try {
+      if (!_refreshing) _refreshing = _doRefresh();
+      token = await _refreshing;
+    } finally {
+      _refreshing = null;
+    }
+    const retry = await fetch(apiBase + path, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token
+      },
+      ...options
+    });
+    if (!retry.ok) {
+      const data = await retry.json().catch(() => ({}));
+      const error = new Error(data.message || "فشل تنفيذ الطلب");
+      error.status = retry.status;
+      throw error;
+    }
+    return retry.json();
+  }
 
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));

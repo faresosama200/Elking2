@@ -77,6 +77,25 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Dashboard stats endpoint (all authenticated roles)
+app.get("/api/dashboard", requireAuth, async (req, res, next) => {
+  try {
+    const prisma = require("./config/prisma");
+    const [students, companies, universities, jobs, applications] = await Promise.all([
+      prisma.student.count(),
+      prisma.company.count(),
+      prisma.university.count(),
+      prisma.job.count(),
+      prisma.application.count()
+    ]);
+    res.json({
+      stats: { students, companies, universities, jobs, applications }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.use("/api/auth", authRoutes);
 
 // Profile endpoint (GET + PUT) for all authenticated roles

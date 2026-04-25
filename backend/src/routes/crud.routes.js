@@ -78,7 +78,8 @@ const universitiesRouter = buildCrudRouter(
   ["ADMIN"]
 );
 
-const jobsRouter = buildCrudRouter(
+// Jobs: STUDENT can read (GET), ADMIN/COMPANY can write
+const jobsRouterBase = buildCrudRouter(
   {
     model: "job",
     searchFields: ["title", "location", "description"],
@@ -88,6 +89,20 @@ const jobsRouter = buildCrudRouter(
   jobUpdateSchema,
   ["ADMIN", "COMPANY"]
 );
+
+const jobsRouter = express.Router();
+const jobHandlers = createCrudHandlers({
+  model: "job",
+  searchFields: ["title", "location", "description"],
+  include: { company: true, skills: { include: { skill: true } } }
+});
+// All authenticated users can read jobs
+jobsRouter.get("/", requireAuth, validate(querySchema, "query"), jobHandlers.list);
+jobsRouter.get("/:id", requireAuth, validate(idParamSchema, "params"), jobHandlers.getOne);
+// Only ADMIN/COMPANY can create/update/delete
+jobsRouter.post("/", requireAuth, requireRole("ADMIN", "COMPANY"), validate(jobCreateSchema), jobHandlers.create);
+jobsRouter.put("/:id", requireAuth, requireRole("ADMIN", "COMPANY"), validate(idParamSchema, "params"), validate(jobUpdateSchema), jobHandlers.update);
+jobsRouter.delete("/:id", requireAuth, requireRole("ADMIN", "COMPANY"), validate(idParamSchema, "params"), jobHandlers.remove);
 
 const skillsRouter = buildCrudRouter(
   {

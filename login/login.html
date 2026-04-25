@@ -123,6 +123,13 @@ function isLocalStaticDev() {
     && window.location.port === "5500";
 }
 
+function isGitHubPages() {
+  return window.location.hostname === "faresosama200.github.io";
+}
+
+// Production backend URL on Render.com (update after first deploy)
+const RENDER_API_URL = "https://talenthub-api.onrender.com/api";
+
 function getExplicitApiBase() {
   const byQuery = new URLSearchParams(window.location.search).get("api");
   const byWindow = window.TALENTHUB_API_BASE;
@@ -149,6 +156,12 @@ function buildApiCandidates() {
 
   if (explicitApi) {
     candidates.push(explicitApi);
+  }
+
+  // On GitHub Pages, always use Render.com backend first
+  if (isGitHubPages()) {
+    candidates.push(RENDER_API_URL);
+    return unique(candidates);
   }
 
   if (preferNodeApi) {
@@ -306,7 +319,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     const route = roleRoutes[data.user.role] || "../index.html";
     window.location.href = route;
   } catch {
-        showAlert("تعذر الاتصال بالخادم. شغّل Apache وMySQL ثم افتح الصفحة من http://localhost/talenthub/login/login.html أو فعّل PHP على localhost:8080.");
+        showAlert("تعذر الاتصال بالخادم. تأكد أن الخادم يعمل على http://localhost:4000 ثم حاول مجدداً.");
   } finally {
     setLoading(false);
   }
