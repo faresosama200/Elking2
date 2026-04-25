@@ -122,6 +122,18 @@ function normalizeApiBase(value) {
   return String(value || "").trim().replace(/\/+$/, "");
 }
 
+function isLocalStaticDev() {
+  return window.location.hostname === "127.0.0.1"
+    && window.location.port === "5500";
+}
+
+function isGitHubPages() {
+  return window.location.hostname === "faresosama200.github.io";
+}
+
+// Production backend URL on Render.com (update after first deploy)
+const RENDER_API_URL = "https://talenthub-api.onrender.com/api";
+
 function getExplicitApiBase() {
   const byQuery = new URLSearchParams(window.location.search).get("api");
   const byWindow = window.TALENTHUB_API_BASE;
@@ -143,6 +155,17 @@ function buildApiCandidates() {
 
   if (explicitApi) {
     candidates.push(explicitApi);
+  }
+
+  // On GitHub Pages, always use Render.com backend first
+  if (isGitHubPages()) {
+    candidates.push(RENDER_API_URL);
+    return unique(candidates);
+  }
+
+  if (isLocalStaticDev()) {
+    candidates.push("http://127.0.0.1:4000/api");
+    candidates.push("http://localhost:4000/api");
   }
 
   if (window.location.protocol !== "file:") {
