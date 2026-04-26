@@ -1,0 +1,11 @@
+[build]
+  command = "echo 'Frontend is static'"
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/login/login.html"
+  status = 200
+
+[dev]
+  port = 5500
