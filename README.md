@@ -72,8 +72,27 @@ npm run dev:api
 
 - تشغيل سريع بضغطة واحدة على Windows:
 
-	- اضغط مرتين على `run-project.bat` من جذر المشروع.
-	- سيقوم بتشغيل Backend + Frontend وفتح صفحة الدخول تلقائياً في المتصفح.
+	- اضغط مرتين على [START-TalentHub.bat](START-TalentHub.bat) من جذر المشروع.
+	- أو استخدم [run-project.bat](run-project.bat) (أصبح يستخدم نفس المحرك الجديد).
+	- سيقوم بتشغيل Backend + Frontend + Prisma + Seed والتحقق من /health ثم فتح صفحة الدخول تلقائيا.
+
+- تشغيل سريع عبر npm:
+
+```bash
+npm run quick:start
+```
+
+- لو أردت فتح كل لوحات التحكم تلقائيا بعد التشغيل:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\quick-start.ps1 -OpenAllDashboards
+```
+
+- عند وجود أي مشكلة تشغيل، راجع ملفات السجلات داخل:
+
+```text
+.runtime-logs/
+```
 
 ## الاختبارات
 
@@ -119,3 +138,25 @@ npm run lint:api
 
 - يوجد فحص تلقائي عند كل push و pull request عبر GitHub Actions في `.github/workflows/ci-check.yml`.
 - هذا الفحص ينفذ: Prisma generate/push ثم `npm run check:all`.
+
+## نشر المنصة (Frontend + Backend مجاني)
+
+1. Frontend على GitHub Pages:
+1. تأكد أن الفرع `main` يحتوي الملفات الحالية.
+2. افتح GitHub Repository > Settings > Pages.
+3. اجعل Source = GitHub Actions.
+4. شغّل workflow [deploy-frontend-pages.yml](.github/workflows/deploy-frontend-pages.yml) أو نفّذ push جديد.
+5. رابط الواجهة النهائي سيكون غالبا:
+   [https://faresosama200.github.io/Elking2/login/login.html](https://faresosama200.github.io/Elking2/login/login.html)
+
+2. Backend مجاني (Render):
+1. افتح Render ثم New > Blueprint.
+2. اربط نفس Repository وسيقرأ [render.yaml](render.yaml) تلقائيا.
+3. بعد اكتمال النشر انسخ رابط الخدمة (مثال):
+   `https://elking2-api.onrender.com/api`
+4. تأكد أن `CORS_ORIGIN` في Render يشمل رابط GitHub Pages.
+
+3. الربط النهائي:
+1. ملفات الواجهة تستخدم رابط Render تلقائيا على GitHub Pages.
+2. رابط التجربة الذي سترسله للناس:
+   [https://faresosama200.github.io/Elking2/login/login.html](https://faresosama200.github.io/Elking2/login/login.html)
