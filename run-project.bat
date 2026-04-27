@@ -1,4 +1,5 @@
 @echo off
+:: تشغيل المشروع كاملاً - Backend + Frontend
 setlocal
 
 set "ROOT=%~dp0"
@@ -27,23 +28,21 @@ if not exist "%ROOT%backend\.env" (
 	pause
 )
 
-REM === Check Prisma Client ===
-if not exist "%ROOT%backend\node_modules\.prisma" (
-	echo [INFO] توليد Prisma Client ...
-	call npm --prefix backend run prisma:generate || (
-		echo [خطأ] فشل توليد Prisma Client.
-		pause
-		exit /b 1
-	)
-)
+REM === Generate Prisma Client ===
+echo [INFO] تجهيز قاعدة البيانات ...
+cd /d "%ROOT%backend"
+call node node_modules/prisma/build/index.js generate >nul 2>&1
+call node node_modules/prisma/build/index.js db push --accept-data-loss >nul 2>&1
+call node src/seed.js 2>&1
+cd /d "%ROOT%"
 
 REM === Start backend API ===
 echo Starting backend API on http://localhost:4000 ...
-start "TalentHub API" cmd /k "cd /d ""%ROOT%"" && npm run dev:api"
+start "TalentHub API" cmd /k "cd /d ""%ROOT%backend"" && node src/server.js"
 
 REM === Start frontend server ===
 echo Starting frontend server on http://127.0.0.1:5500 ...
-start "TalentHub Frontend" cmd /k "cd /d ""%ROOT%"" && npx --yes http-server@14.1.1 -p 5500 -c-1"
+start "TalentHub Frontend" cmd /k "cd /d ""%ROOT%"" && node serve-frontend.js"
 
 echo Waiting a few seconds before opening browser...
 timeout /t 4 /nobreak >nul
