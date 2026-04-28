@@ -91,7 +91,7 @@ function buildApiCandidates() {
 
 async function probeApi(base) {
   const controller = typeof AbortController === "function" ? new AbortController() : null;
-  const timeoutId = controller ? window.setTimeout(() => controller.abort(), 1500) : null;
+  const timeoutId = controller ? window.setTimeout(() => controller.abort(), 5000) : null;
 
   try {
     const response = await fetch(base + "/health", {
@@ -130,6 +130,9 @@ async function resolveApiBase() {
     }
 
     window.sessionStorage.removeItem(API_CACHE_KEY);
+    if (candidates.includes(RENDER_API_URL)) {
+      return RENDER_API_URL;
+    }
     return candidates[0];
   }());
 

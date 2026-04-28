@@ -190,7 +190,7 @@ function buildApiCandidates() {
 
 async function probeApi(base) {
   const controller = typeof AbortController === "function" ? new AbortController() : null;
-  const timeoutId = controller ? window.setTimeout(() => controller.abort(), 1500) : null;
+  const timeoutId = controller ? window.setTimeout(() => controller.abort(), 5000) : null;
 
   try {
     const response = await fetch(base + "/health", {
@@ -229,6 +229,9 @@ async function resolveApiBase() {
     }
 
     window.sessionStorage.removeItem(API_CACHE_KEY);
+    if (candidates.includes(RENDER_API_URL)) {
+      return RENDER_API_URL;
+    }
     throw new Error("API_UNAVAILABLE");
   }());
 
@@ -322,7 +325,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     const route = roleRoutes[data.user.role] || "../index.html";
     window.location.href = route;
   } catch {
-        showAlert("تعذر الاتصال بالخادم. تأكد أن الخادم يعمل على http://localhost:4000 ثم حاول مجدداً.");
+        showAlert("تعذر الاتصال بالخادم. تأكد من اتصال الإنترنت أو تشغيل الخادم المحلي على http://localhost:4000 ثم حاول مرة أخرى.");
   } finally {
     setLoading(false);
   }
