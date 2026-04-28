@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["nodejs", "openssl", "gcc", "python3"]
+
+[phases.install]
+cmds = ["npm install --include=optional"]
+
+[phases.build]
+cmds = [
+  "node node_modules/prisma/build/index.js generate",
+  "node node_modules/prisma/build/index.js db push --accept-data-loss",
+  "node src/seed.js"
+]
+
+[start]
+cmd = "node src/server.js"
