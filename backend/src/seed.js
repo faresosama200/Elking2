@@ -4,21 +4,33 @@ const prisma = require("./config/prisma");
 
 async function main() {
   const hash = (p) => bcrypt.hash(p, 10);
-
-  // ======== Admin ========
-  let admin = await prisma.user.findUnique({ where: { email: "admin@talenthub.local" } });
-  if (!admin) {
-    admin = await prisma.user.create({
-      data: {
-        fullName: "مدير النظام",
-        email: "admin@talenthub.local",
-        passwordHash: await hash("Admin1234"),
-        role: "ADMIN",
+  const ensureUser = async ({ fullName, email, password, role }) => {
+    return prisma.user.upsert({
+      where: { email },
+      update: {
+        fullName,
+        passwordHash: await hash(password),
+        role,
+        status: "ACTIVE"
+      },
+      create: {
+        fullName,
+        email,
+        passwordHash: await hash(password),
+        role,
         status: "ACTIVE"
       }
     });
-    console.log("✅ Admin: admin@talenthub.local / Admin1234");
-  }
+  };
+
+  // ======== Admin ========
+  await ensureUser({
+    fullName: "مدير النظام",
+    email: "admin@talenthub.local",
+    password: "Admin1234",
+    role: "ADMIN"
+  });
+  console.log("✅ Admin: admin@talenthub.local / Admin1234");
 
   // ======== Universities ========
   const uniEmails = [
@@ -28,17 +40,19 @@ async function main() {
   ];
   const universities = [];
   for (const u of uniEmails) {
-    let user = await prisma.user.findUnique({ where: { email: u.email } });
-    if (!user) {
-      user = await prisma.user.create({
-        data: { fullName: u.name, email: u.email, passwordHash: await hash("Uni12345"), role: "UNIVERSITY", status: "ACTIVE" }
-      });
-      await prisma.university.create({
-        data: { userId: user.id, name: u.name, location: u.location, status: "ACTIVE" }
-      });
-      console.log(`✅ University: ${u.email} / Uni12345`);
-    }
-    universities.push(await prisma.university.findUnique({ where: { userId: user.id } }));
+    const user = await ensureUser({
+      fullName: u.name,
+      email: u.email,
+      password: "Uni12345",
+      role: "UNIVERSITY"
+    });
+    const university = await prisma.university.upsert({
+      where: { userId: user.id },
+      update: { name: u.name, location: u.location, status: "ACTIVE" },
+      create: { userId: user.id, name: u.name, location: u.location, status: "ACTIVE" }
+    });
+    universities.push(university);
+    console.log(`✅ University: ${u.email} / Uni12345`);
   }
 
   // ======== Companies ========
@@ -49,17 +63,19 @@ async function main() {
   ];
   const companies = [];
   for (const c of compEmails) {
-    let user = await prisma.user.findUnique({ where: { email: c.email } });
-    if (!user) {
-      user = await prisma.user.create({
-        data: { fullName: c.name, email: c.email, passwordHash: await hash("Comp1234"), role: "COMPANY", status: "ACTIVE" }
-      });
-      await prisma.company.create({
-        data: { userId: user.id, name: c.name, industry: c.industry, status: "ACTIVE" }
-      });
-      console.log(`✅ Company: ${c.email} / Comp1234`);
-    }
-    companies.push(await prisma.company.findUnique({ where: { userId: user.id } }));
+    const user = await ensureUser({
+      fullName: c.name,
+      email: c.email,
+      password: "Comp1234",
+      role: "COMPANY"
+    });
+    const company = await prisma.company.upsert({
+      where: { userId: user.id },
+      update: { name: c.name, industry: c.industry, status: "ACTIVE" },
+      create: { userId: user.id, name: c.name, industry: c.industry, status: "ACTIVE" }
+    });
+    companies.push(company);
+    console.log(`✅ Company: ${c.email} / Comp1234`);
   }
 
   // ======== Skills ========
@@ -94,34 +110,37 @@ async function main() {
   ];
   const students = [];
   for (const s of studentData) {
-    let user = await prisma.user.findUnique({ where: { email: s.email } });
-    if (!user) {
-      user = await prisma.user.create({
-        data: { fullName: s.name, email: s.email, passwordHash: await hash("Student1"), role: "STUDENT", status: "ACTIVE" }
-      });
-      const student = await prisma.student.create({
-        data: {
-          userId: user.id,
-          universityId: universities[s.uniIdx]?.id || null,
-          bio: `طالب متميز في مجال التكنولوجيا`,
-          status: "ACTIVE"
-        }
-      });
-      // Add 2 skills per student
-      const idx = studentData.indexOf(s);
-      for (const skillId of [skills[idx % skills.length].id, skills[(idx + 1) % skills.length].id]) {
-        await prisma.studentSkill.upsert({
-          where: { studentId_skillId: { studentId: student.id, skillId } },
-          update: {},
-          create: { studentId: student.id, skillId }
-        });
+    const user = await ensureUser({
+      fullName: s.name,
+      email: s.email,
+      password: "Student1",
+      role: "STUDENT"
+    });
+    const student = await prisma.student.upsert({
+      where: { userId: user.id },
+      update: {
+        universityId: universities[s.uniIdx]?.id || null,
+        bio: "طالب متميز في مجال التكنولوجيا",
+        status: "ACTIVE"
+      },
+      create: {
+        userId: user.id,
+        universityId: universities[s.uniIdx]?.id || null,
+        bio: "طالب متميز في مجال التكنولوجيا",
+        status: "ACTIVE"
       }
-      students.push(student);
-      console.log(`✅ Student: ${s.email} / Student1`);
-    } else {
-      const st = await prisma.student.findUnique({ where: { userId: user.id } });
-      if (st) students.push(st);
+    });
+    // Add 2 skills per student
+    const idx = studentData.indexOf(s);
+    for (const skillId of [skills[idx % skills.length].id, skills[(idx + 1) % skills.length].id]) {
+      await prisma.studentSkill.upsert({
+        where: { studentId_skillId: { studentId: student.id, skillId } },
+        update: {},
+        create: { studentId: student.id, skillId }
+      });
     }
+    students.push(student);
+    console.log(`✅ Student: ${s.email} / Student1`);
   }
 
   // ======== Jobs ========
