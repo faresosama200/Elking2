@@ -83,6 +83,9 @@ function buildApiCandidates() {
   candidates.push("http://localhost:4000/api");
   candidates.push("http://127.0.0.1:4000/api");
 
+  // Always fall back to production Railway backend
+  candidates.push(RENDER_API_URL);
+
   return unique(candidates);
 }
 
