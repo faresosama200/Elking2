@@ -47,52 +47,9 @@ function getExplicitApiBase() {
   return explicit;
 }
 
-function buildApiCandidates() {
-  const host = window.location.hostname || "localhost";
-  const protocol = host === "127.0.0.1" ? "http:" : (window.location.protocol === "file:" ? "http:" : window.location.protocol);
-  const candidates = [];
-  const explicitApi = getExplicitApiBase();
-  const preferNodeApi = isLocalStaticDev() && !explicitApi;
-
-  if (explicitApi) {
-    candidates.push(explicitApi);
-  }
-
-  // On GitHub Pages, always use Render.com backend first
-  if (isGitHubPages()) {
-    candidates.push(RENDER_API_URL);
-    return unique(candidates);
-  }
-
-  if (preferNodeApi) {
-    candidates.push("http://127.0.0.1:4000/api");
-    candidates.push("http://localhost:4000/api");
-  }
-
-  if (window.location.protocol !== "file:") {
-    candidates.push(new URL(dashboardDepth + "/php-api/index.php", window.location.href).toString());
-  }
-
-  candidates.push(protocol + "//" + host + "/talenthub/php-api/index.php");
-  candidates.push(protocol + "//" + host + "/php-api/index.php");
-  candidates.push("http://localhost/talenthub/php-api/index.php");
-  candidates.push("http://127.0.0.1/talenthub/php-api/index.php");
-  candidates.push("http://localhost:8080/php-api/index.php");
-  candidates.push("http://127.0.0.1:8080/php-api/index.php");
-  // Node.js backend fallback (port 4000)
-  candidates.push("http://localhost:4000/api");
-  candidates.push("http://127.0.0.1:4000/api");
-
-  // Always fall back to production Railway backend
-  candidates.push(RENDER_API_URL);
-
-  return unique(candidates);
-}
-
-async function probeApi(base) {
+async function probeLocal(base) {
   const controller = typeof AbortController === "function" ? new AbortController() : null;
-  const timeoutId = controller ? window.setTimeout(() => controller.abort(), 5000) : null;
-
+  const timeoutId = controller ? window.setTimeout(() => controller.abort(), 2000) : null;
   try {
     const response = await fetch(base + "/health", {
       method: "GET",
@@ -103,9 +60,7 @@ async function probeApi(base) {
   } catch {
     return false;
   } finally {
-    if (timeoutId) {
-      window.clearTimeout(timeoutId);
-    }
+    if (timeoutId) window.clearTimeout(timeoutId);
   }
 }
 
@@ -115,31 +70,33 @@ async function resolveApiBase() {
   }
 
   resolvedApiBasePromise = (async function () {
-    const candidates = buildApiCandidates();
-    const cached = window.sessionStorage.getItem(API_CACHE_KEY);
+    const explicit = getExplicitApiBase();
+    if (explicit) return explicit;
 
-    if (cached && candidates.includes(cached) && await probeApi(cached)) {
-      return cached;
-    }
-
-    for (const candidate of candidates) {
-      if (await probeApi(candidate)) {
-        window.sessionStorage.setItem(API_CACHE_KEY, candidate);
-        return candidate;
-      }
-    }
-
-    window.sessionStorage.removeItem(API_CACHE_KEY);
-    if (candidates.includes(RENDER_API_URL)) {
+    // GitHub Pages or any non-local host → use Railway directly
+    if (!isLocalStaticDev()) {
       return RENDER_API_URL;
     }
-    return candidates[0];
+
+    // Local dev: try localhost:4000 first (2s), then Railway
+    const cached = window.sessionStorage.getItem(API_CACHE_KEY);
+    if (cached === "http://127.0.0.1:4000/api" && await probeLocal("http://127.0.0.1:4000/api")) {
+      return cached;
+    }
+    window.sessionStorage.removeItem(API_CACHE_KEY);
+
+    if (await probeLocal("http://127.0.0.1:4000/api")) {
+      window.sessionStorage.setItem(API_CACHE_KEY, "http://127.0.0.1:4000/api");
+      return "http://127.0.0.1:4000/api";
+    }
+
+    return RENDER_API_URL;
   }());
 
   return resolvedApiBasePromise;
 }
 
-const API = buildApiCandidates()[0];
+const API = isLocalStaticDev() ? "http://127.0.0.1:4000/api" : RENDER_API_URL;
 
 function getToken() {
   return localStorage.getItem("th_token");
