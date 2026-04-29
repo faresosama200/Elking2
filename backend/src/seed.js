@@ -80,14 +80,28 @@ async function main() {
 
   // ======== Skills ========
   const skillNames = [
-    { name: "JavaScript",    category: "برمجة" },
-    { name: "Python",        category: "برمجة" },
-    { name: "React",         category: "تطوير الويب" },
-    { name: "Node.js",       category: "تطوير الويب" },
-    { name: "SQL",           category: "قواعد البيانات" },
-    { name: "Machine Learning", category: "ذكاء اصطناعي" },
-    { name: "UI/UX Design",  category: "تصميم" },
-    { name: "Project Management", category: "إدارة" }
+    { name: "JavaScript",         category: "برمجة" },
+    { name: "Python",             category: "برمجة" },
+    { name: "React",              category: "تطوير الويب" },
+    { name: "Node.js",            category: "تطوير الويب" },
+    { name: "SQL",                category: "قواعد البيانات" },
+    { name: "Machine Learning",   category: "ذكاء اصطناعي" },
+    { name: "UI/UX Design",       category: "تصميم" },
+    { name: "Project Management", category: "إدارة" },
+    { name: "رقص",                category: "الفنون والأداء" },
+    { name: "غناء",               category: "الفنون والأداء" },
+    { name: "عزف الطبل",          category: "الفنون والأداء" },
+    { name: "عزف الغيتار",        category: "الفنون والأداء" },
+    { name: "عزف البيانو",        category: "الفنون والأداء" },
+    { name: "تمثيل",              category: "الفنون والأداء" },
+    { name: "رسم",                category: "الفنون البصرية" },
+    { name: "تصوير فوتوغرافي",    category: "الفنون البصرية" },
+    { name: "تصميم جرافيك",       category: "الفنون البصرية" },
+    { name: "كتابة إبداعية",      category: "الفنون الأدبية" },
+    { name: "شعر",                category: "الفنون الأدبية" },
+    { name: "خطابة",              category: "مهارات ناعمة" },
+    { name: "قيادة فريق",         category: "مهارات ناعمة" },
+    { name: "حل المشكلات",        category: "مهارات ناعمة" },
   ];
   const skills = [];
   for (const s of skillNames) {

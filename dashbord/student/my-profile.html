@@ -130,11 +130,12 @@ async function loadProfile(){
   const p = await apiFetch("/profile");
   fullName.value = p.fullName || "";
   email.value = p.email || "";
-  university.value = p.university?.name || "";
-  bio.value = p.bio || "";
+  university.value = p.student?.university?.name || "";
+  bio.value = p.student?.bio || "";
 
-  mySkillIds = new Set((p.skills||[]).map(s=>String(s.id)));
-  renderMySkills(p.skills||[]);
+  const flatSkills = (p.student?.skills || []).map(s => s.skill || s);
+  mySkillIds = new Set(flatSkills.map(s => String(s.id)));
+  renderMySkills(flatSkills);
 }
 
 async function saveProfile(){
@@ -156,28 +157,35 @@ function renderMySkills(skills){
 }
 
 async function addSkill(id,name){
-  await apiFetch("/profile/skills",{method:"POST",body:JSON.stringify({skillId:Number(id)})});
+  await apiFetch("/profile/skills",{method:"POST",body:JSON.stringify({skillId:id})});
   loadProfile();
+  loadAllSkills();
 }
 
 async function removeSkill(id,name){
   if(!confirm("حذف "+name+"؟")) return;
   await apiFetch("/profile/skills/"+id,{method:"DELETE"});
   loadProfile();
-}
-
-async function createSkill(){
-  await apiFetch("/profile/skills",{method:"POST",body:JSON.stringify({
-    name:newSkillName.value,
-    category:newSkillCategory.value
-  })});
-  loadProfile();
   loadAllSkills();
 }
 
+async function createSkill(){
+  const name = newSkillName.value.trim();
+  const category = newSkillCategory.value.trim() || "أخرى";
+  if (!name) { newSkillHint.textContent = "اكتب اسم المهارة"; return; }
+  newSkillHint.textContent = "";
+  await apiFetch("/profile/skills",{method:"POST",body:JSON.stringify({name, category})});
+  newSkillName.value = "";
+  newSkillCategory.value = "";
+  loadProfile();
+  loadAllSkills();
+  showToast(name + " تمت إضافتها", "success");
+}
+
 function renderAvailableSkills(skills){
+  const q = skillSearch.value.trim().toLowerCase();
   availableSkillsList.innerHTML = skills
-  .filter(s=>!mySkillIds.has(String(s.id)))
+  .filter(s=>!mySkillIds.has(String(s.id)) && (!q || s.name.toLowerCase().includes(q) || (s.category||'').toLowerCase().includes(q)))
   .map(s=>`<button class="btn btn-sm btn-outline-secondary" onclick="addSkill('${s.id}','${s.name}')">+ ${s.name}</button>`)
   .join("");
 }

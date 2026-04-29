@@ -92,15 +92,18 @@ jobsRouter.post("/", requireAuth, requireRole("ADMIN", "COMPANY"), validate(jobC
 jobsRouter.put("/:id", requireAuth, requireRole("ADMIN", "COMPANY"), validate(idParamSchema, "params"), validate(jobUpdateSchema), jobHandlers.update);
 jobsRouter.delete("/:id", requireAuth, requireRole("ADMIN", "COMPANY"), validate(idParamSchema, "params"), jobHandlers.remove);
 
-const skillsRouter = buildCrudRouter(
-  {
-    model: "skill",
-    searchFields: ["name", "category"]
-  },
-  skillCreateSchema,
-  skillUpdateSchema,
-  ["ADMIN"]
-);
+const skillHandlers = createCrudHandlers({
+  model: "skill",
+  searchFields: ["name", "category"]
+});
+const skillsRouter = express.Router();
+// All authenticated users can list/get skills
+skillsRouter.get("/", requireAuth, validate(querySchema, "query"), skillHandlers.list);
+skillsRouter.get("/:id", requireAuth, validate(idParamSchema, "params"), skillHandlers.getOne);
+// Only ADMIN can create/update/delete
+skillsRouter.post("/", requireAuth, requireRole("ADMIN"), validate(skillCreateSchema), skillHandlers.create);
+skillsRouter.put("/:id", requireAuth, requireRole("ADMIN"), validate(idParamSchema, "params"), validate(skillUpdateSchema), skillHandlers.update);
+skillsRouter.delete("/:id", requireAuth, requireRole("ADMIN"), validate(idParamSchema, "params"), skillHandlers.remove);
 
 const applicationsRouter = buildCrudRouter(
   {

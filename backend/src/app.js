@@ -7,7 +7,7 @@ const logger = require("./config/logger");
 const prisma = require("./config/prisma");
 const authRoutes = require("./routes/auth.routes");
 const authController = require("./controllers/auth.controller");
-const { requireAuth } = require("./middlewares/auth");
+const { requireAuth, requireRole } = require("./middlewares/auth");
 const {
   usersRouter,
   studentsRouter,
@@ -131,6 +131,51 @@ app.use("/api/auth", authRoutes);
 const profileRouter = express.Router();
 profileRouter.get("/", requireAuth, authController.getProfile);
 profileRouter.put("/", requireAuth, authController.updateProfile);
+
+// Student: add skill to own profile (by skillId OR create new by name+category)
+profileRouter.post("/skills", requireAuth, requireRole("STUDENT"), async (req, res, next) => {
+  try {
+    const student = await prisma.student.findUnique({ where: { userId: req.user.id } });
+    if (!student) return res.status(404).json({ message: "Student profile not found" });
+    const { skillId, name, category } = req.body;
+    let targetSkillId = skillId;
+    if (!skillId && name) {
+      const existing = await prisma.skill.findUnique({ where: { name: String(name).trim() } });
+      if (existing) {
+        targetSkillId = existing.id;
+      } else {
+        const newSkill = await prisma.skill.create({
+          data: { name: String(name).trim(), category: String(category || "أخرى").trim(), status: "ACTIVE" }
+        });
+        targetSkillId = newSkill.id;
+      }
+    }
+    if (!targetSkillId) return res.status(400).json({ message: "skillId or name required" });
+    await prisma.studentSkill.upsert({
+      where: { studentId_skillId: { studentId: student.id, skillId: targetSkillId } },
+      create: { studentId: student.id, skillId: targetSkillId },
+      update: {}
+    });
+    return res.json({ message: "Skill added" });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// Student: remove skill from own profile
+profileRouter.delete("/skills/:skillId", requireAuth, requireRole("STUDENT"), async (req, res, next) => {
+  try {
+    const student = await prisma.student.findUnique({ where: { userId: req.user.id } });
+    if (!student) return res.status(404).json({ message: "Student profile not found" });
+    await prisma.studentSkill.deleteMany({
+      where: { studentId: student.id, skillId: req.params.skillId }
+    });
+    return res.json({ message: "Skill removed" });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 app.use("/api/profile", profileRouter);
 
 app.use("/api/users", usersRouter);
