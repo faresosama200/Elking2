@@ -2,6 +2,10 @@ const bcrypt = require("bcryptjs");
 const prisma = require("../config/prisma");
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require("../utils");
 
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
 function serializeAuth(user) {
   const payload = {
     sub: user.id,
@@ -24,7 +28,8 @@ function serializeAuth(user) {
 async function register(req, res, next) {
   try {
     const { fullName, email, password, role, profile } = req.body;
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = normalizeEmail(email);
+    const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existing) {
       return res.status(409).json({ message: "Email already exists" });
     }
@@ -33,7 +38,7 @@ async function register(req, res, next) {
     const created = await prisma.user.create({
       data: {
         fullName,
-        email,
+        email: normalizedEmail,
         passwordHash,
         role
       }
@@ -89,7 +94,8 @@ async function register(req, res, next) {
 async function login(req, res, next) {
   try {
     const { email, password } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = normalizeEmail(email);
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
