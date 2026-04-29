@@ -255,10 +255,21 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
     });
-    const data = await response.json();
+    let data = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
 
     if (!response.ok) {
-      showAlert(data.message || "فشل تسجيل الدخول.");
+      if (response.status === 401 || response.status === 403) {
+        showAlert("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
+      } else if (response.status >= 500) {
+        showAlert("حدث خطأ في الخادم. حاول مرة أخرى بعد قليل.");
+      } else {
+        showAlert((data && data.message) || "تعذر إتمام تسجيل الدخول حالياً.");
+      }
       return;
     }
 
@@ -283,7 +294,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     const route = roleRoutes[data.user.role] || "../index.html";
     window.location.href = route;
   } catch {
-        showAlert("تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت ثم حاول مرة أخرى.");
+    showAlert("تعذر الاتصال بالخادم. تحقق من الإنترنت أو حاول مرة أخرى بعد ثوانٍ.");
   } finally {
     setLoading(false);
   }
