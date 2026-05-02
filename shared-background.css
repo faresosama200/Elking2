@@ -1,0 +1,38 @@
+/*
+  Fixed two-layer site background.
+  Put your images here:
+  - /assets/bg-top.jpg
+  - /assets/bg-bottom.jpg
+*/
+
+body {
+  position: relative;
+  isolation: isolate;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+/* Top image */
+body::before {
+  background-image: url("assets/bg-top.jpg");
+  background-position: center top;
+}
+
+/* Bottom image */
+body::after {
+  background-image:
+    linear-gradient(to bottom, rgba(10, 38, 70, 0.18), rgba(10, 38, 70, 0.58)),
+    url("assets/bg-bottom.jpg");
+  background-position: center bottom;
+  z-index: -1;
+}

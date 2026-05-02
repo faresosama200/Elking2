@@ -27,7 +27,7 @@ function serializeAuth(user) {
 
 async function register(req, res, next) {
   try {
-    const { fullName, email, password, role, profile } = req.body;
+    const { fullName, email, password, role, profile, companyName, universityName } = req.body;
     const normalizedEmail = normalizeEmail(email);
     const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existing) {
@@ -55,10 +55,13 @@ async function register(req, res, next) {
     }
 
     if (role === "COMPANY") {
+      const resolvedCompanyName = String(
+        companyName || profile?.name || fullName || ""
+      ).trim();
       await prisma.company.create({
         data: {
           userId: created.id,
-          name: profile?.name || fullName,
+          name: resolvedCompanyName,
           industry: profile?.industry || "General",
           status: "PENDING"
         }
@@ -66,10 +69,13 @@ async function register(req, res, next) {
     }
 
     if (role === "UNIVERSITY") {
+      const resolvedUniversityName = String(
+        universityName || profile?.name || fullName || ""
+      ).trim();
       await prisma.university.create({
         data: {
           userId: created.id,
-          name: profile?.name || fullName,
+          name: resolvedUniversityName,
           location: profile?.location || "Unknown",
           status: "PENDING"
         }
