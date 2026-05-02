@@ -24,15 +24,13 @@ body::after {
 
 /* Top image */
 body::before {
-  background-image: url("assets/bg-top.jpg");
+  background-image: url("assets/bg-top.png");
   background-position: center top;
 }
 
 /* Bottom image */
 body::after {
-  background-image:
-    linear-gradient(to bottom, rgba(10, 38, 70, 0.18), rgba(10, 38, 70, 0.58)),
-    url("assets/bg-bottom.jpg");
+  background-image: url("assets/bg-bottom.png");
   background-position: center bottom;
   z-index: -1;
 }
