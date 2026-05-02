@@ -1,36 +1,16 @@
 /*
   Fixed two-layer site background.
-  Put your images here:
-  - /assets/bg-top.jpg
-  - /assets/bg-bottom.jpg
+  Stacks bg-top.png (top half) over bg-bottom.png (bottom half).
 */
 
 body {
   position: relative;
-  isolation: isolate;
-}
-
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -2;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-
-/* Top image */
-body::before {
-  background-image: url("assets/bg-top.png");
-  background-position: center top;
-}
-
-/* Bottom image */
-body::after {
-  background-image: url("assets/bg-bottom.png");
-  background-position: center bottom;
-  z-index: -1;
+  background-image:
+    url("assets/bg-top.png"),
+    url("assets/bg-bottom.png");
+  background-position: top center, bottom center;
+  background-size: 100% 50%, 100% 50%;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+  background-color: #061829;
 }
