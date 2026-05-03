@@ -14,3 +14,22 @@ body {
   background-attachment: fixed, fixed;
   background-color: #061829;
 }
+
+/* Make sections transparent so body background images show through */
+.hero {
+  background: rgba(6, 24, 41, 0.35) !important;
+  color: white !important;
+}
+
+.statistics {
+  background: rgba(6, 24, 41, 0.45) !important;
+  color: white !important;
+}
+
+.statistics .stat-box h2 {
+  color: #7dd3fc !important;
+}
+
+.cta {
+  background: rgba(13, 110, 253, 0.55) !important;
+}
